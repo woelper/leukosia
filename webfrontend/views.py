@@ -113,10 +113,24 @@ def login(request):
 	
 	
 def radiostations(request):
+	for e in STATIONS:
+
+		genres = {}
+		try:
+			cur_song = get_current_song(str(e['admin_port']))
+			genre = cur_song['genre']
+		except:
+			try:
+				cur_song = get_current_song(str(e['admin_port']))
+				genre = cur_song['genre']
+			except:
+				genre = "nix"
+		e['genre'] = genre
 	return render_to_response('stations.html',{'stations':STATIONS},context_instance=RequestContext(request))
 
+
 def nowplaying(request):
-	station_port = request.GET['station']
+	station_port = request.GET['station_port']
 	
 	current_song = get_current_song(station_port.encode('utf-8'))
 	if request.method == 'POST':
@@ -124,7 +138,9 @@ def nowplaying(request):
 	for e in STATIONS:
 		if e['admin_port'] == int(station_port):
 			station_name = e['stream_name']
-	return render_to_response('nowplaying.html',{'cur_song':current_song,'station':station_port,'station_name':station_name},context_instance=RequestContext(request))
+
+	return render_to_response('nowplaying.html',{'cur_song':current_song,'station_port':station_port,'station_name':station_name},context_instance=RequestContext(request))
+
 
 def playqueue(request):
 	return render_to_response('playqueue.html',{},context_instance=RequestContext(request))

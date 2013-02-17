@@ -38,6 +38,9 @@
 {% block content %}
 {% endblock %}	
 <div id="footer">
+	<audio controls  preload="none">
+		<source src="http://leukosia.eu:{{station_port}}/" type="audio/mpeg">
+	</audio>
 	leukosia V0.1 beta 
 </div>
 <script type="text/javascript">
@@ -61,16 +64,16 @@
 	
 	<!--MPD Commands -->
 	$('#stop').click(function() {
-		$.get('/mpdcommands?mpdcommand=stop&port='+ {{station}} );
+		$.get('/mpdcommands?mpdcommand=stop&port='+ {{station_port}} );
 	});
 	$('#playpause').click(function() {
-		$.get('/mpdcommands?mpdcommand=play&port='+ {{station}} );
+		$.get('/mpdcommands?mpdcommand=play&port='+ {{station_port}} );
 	});
 	$('#next').click(function() {
-		$.get('/mpdcommands?mpdcommand=next&port='+ {{station}} );
+		$.get('/mpdcommands?mpdcommand=next&port='+ {{station_port}} );
 	});
 	$('#previous').click(function() {
-		$.get('/mpdcommands?mpdcommand=previous&port='+ {{station}} );
+		$.get('/mpdcommands?mpdcommand=previous&port='+ {{station_port}} );
 	});
 	
 	$(document).ajaxSend(function(event, xhr, settings) {

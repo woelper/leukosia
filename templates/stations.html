@@ -15,13 +15,18 @@
 			<span class="tablecell">Admin Port</span>
 			<span class="tablecell">Stream Port</span>
 			<span class="tablecell">Description</span>
+			<span class="tablecell">Player</span>
 		</div>
 		{% for e in stations %}
 		<div class="tablerow">
-			<span class="tablecell"><a href="/nowplaying?station={{ e.admin_port }}">{{ e.stream_name }}</a></span>
+			<span class="tablecell"><a href="/nowplaying?station_port={{ e.admin_port }}">{{ e.stream_name }}</a></span>
 			<span class="tablecell">{{ e.admin_port }}</span>
 			<span class="tablecell">{{ e.stream_port }}</span>
-			<span class="tablecell">{{ e.description }}</span>
+			<span class="tablecell">{{ e.description }} *** es laeuft: {{ e.genre }}</span>
+			<span class="tablecell">{{ e.stream_port }}</span>
+			<span class="tablecell">	<audio controls preload="Metadata">
+		<source src="http://leukosia.eu:{{ e.stream_port }}/" type="audio/mpeg">
+	</audio></span>
 		</div>
 		{% endfor %}
 </div>
