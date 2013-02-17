@@ -10,24 +10,83 @@
 	
 	<div id="table">
 		
-		<div class="tableheader">		
+		<div class="tableheader">
+			<span class="tablecell"></span>
 			<span class="tablecell">Name</span>
 			<span class="tablecell">Admin Port</span>
 			<span class="tablecell">Stream Port</span>
 			<span class="tablecell">Description</span>
-			<span class="tablecell">Player</span>
 		</div>
 		{% for e in stations %}
 		<div class="tablerow">
+			<span class="tablecell">	
+				
+				<!-- BEGINS: AUTO-GENERATED Museter unlimited SHOUTcast Hosting Museter.com plans start at $6.95 CODE visit http://www.museter.com -->
+<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="180" height="30" bgcolor="#FFFFFF">
+<param name="movie" value="http://www.museter.com/ffmp3-config.swf" />
+<param name="flashvars" value="url=http://leukosia.eu:8000&lang=en&codec=mp3&volume=65&introurl=&traking=false&jsevents=false&buffering=1&skin=http://www.museter.com/skins/substream/ffmp3-substream.xml&title=digga&welcome=WELCOME%20TO..." />
+<param name="wmode" value="window" />
+<param name="allowscriptaccess" value="always" />
+<param name="scale" value="noscale" />
+<embed src="http://www.museter.com/ffmp3-config.swf" flashvars="url=http://leukosia.eu:{{ e.stream_port }}&lang=en&codec=mp3&volume=65&introurl=&traking=false&jsevents=false&buffering=1&skin=http://www.museter.com/skins/substream/ffmp3-substream.xml&title=digga&welcome=WELCOME%20TO..." width="180" scale="noscale" height="30" wmode="transparent" bgcolor="#FFFFFF" allowscriptaccess="always" type="application/x-shockwave-flash" />
+</object>
+<!-- ENDS: AUTO-GENERATED Museter unlimited SHOUTcast Hosting Museter.com plans start at $6.95 CODE visit http://www.museter.com-->
+				<!--<audio controls preload="none">
+					<source src="http://leukosia.eu:{{ e.stream_port }}/" type="audio/mpeg">
+					<p>Your browser does not support native audio, but you can <a href="http://leukosia.eu:{{ e.stream_port }}/">download this MP3</a> to listen on your device.</p>
+				</audio> -->
+			</span>
+
 			<span class="tablecell"><a href="/nowplaying?station_port={{ e.admin_port }}">{{ e.stream_name }}</a></span>
 			<span class="tablecell">{{ e.admin_port }}</span>
 			<span class="tablecell">{{ e.stream_port }}</span>
 			<span class="tablecell">{{ e.description }} *** es laeuft: {{ e.genre }}</span>
-			<span class="tablecell">{{ e.stream_port }}</span>
-			<span class="tablecell">	<audio controls preload="Metadata">
-		<source src="http://leukosia.eu:{{ e.stream_port }}/" type="audio/mpeg">
-	</audio></span>
+			<span class="tablecell">	
 		</div>
+
 		{% endfor %}
+		<input type="text" id="chatcontent" name="chatcontent">
+		<button type="submit" onclick=push_chat()></button>
+		<div id="chat">chat hier</div>
+		
+		
 </div>
+
+<script type="text/javascript">
+	
+	function update_chat() {
+		
+		$.ajax({
+			type: "POST",
+			url:  '/ajaxchat/',
+			dataType: "json",
+			success: function(data, textStatus, XMLHttpRequest) {
+				var html = "";
+				for (var i=0; i<data.length; i++) { 
+					html = html + "<br>"+data[i].content + " * " + data[i].author;
+				}
+				$('#chat').html(html);
+			}	
+		});
+	}
+	
+	$(document).ready(function () {
+		update_chat();
+		setInterval(update_chat,5000);
+	});
+	
+	function push_chat() {
+		content = document.getElementById('chatcontent').value;
+		$.ajax({
+			type: "POST",
+			url:  '/chatpush/',
+			dataType: "json",
+			data:{'chat_content':content},
+			success: function(data, textStatus, XMLHttpRequest) {
+				return True;
+			}	
+		});
+	}
+	
+</script>
 {% endblock %}

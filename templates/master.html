@@ -38,9 +38,9 @@
 {% block content %}
 {% endblock %}	
 <div id="footer">
-	<audio controls  preload="none">
-		<source src="http://leukosia.eu:{{station_port}}/" type="audio/mpeg">
-	</audio>
+	<!-- <audio controls  preload="none">
+		<source src="http://leukosia.eu:{{stream_port}}/" type="audio/mpeg">
+	</audio> -->
 	leukosia V0.1 beta 
 </div>
 <script type="text/javascript">
@@ -62,20 +62,22 @@
 	});
 	
 	
-	<!--MPD Commands -->
-	$('#stop').click(function() {
-		$.get('/mpdcommands?mpdcommand=stop&port='+ {{station_port}} );
+	<!--MPD Commands 
+	{% block controls %}
+	/*$('#stop').click(function() {
+		$.get('/mpdcommands?mpdcommand=stop&port='+ {{stream_port}} );
 	});
 	$('#playpause').click(function() {
-		$.get('/mpdcommands?mpdcommand=play&port='+ {{station_port}} );
+		$.get('/mpdcommands?mpdcommand=play&port='+ {{stream_port}} );
 	});
 	$('#next').click(function() {
-		$.get('/mpdcommands?mpdcommand=next&port='+ {{station_port}} );
+		$.get('/mpdcommands?mpdcommand=next&port='+ {{stream_port}} );
 	});
 	$('#previous').click(function() {
-		$.get('/mpdcommands?mpdcommand=previous&port='+ {{station_port}} );
-	});
-	
+		$.get('/mpdcommands?mpdcommand=previous&port='+ {{stream_port}} );
+	});*/
+	{% endblock %}
+	-->
 	$(document).ajaxSend(function(event, xhr, settings) {
     function getCookie(name) {
     var cookieValue = null;

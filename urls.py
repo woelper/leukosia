@@ -22,4 +22,6 @@ urlpatterns = patterns('',
     url(r'^lastfmartistinfo/', 'webfrontend.views.get_lastfm_artistinfo'),
     url(r'^$', 'webfrontend.views.login',name='index'),
     url(r'^mpdcommands/', 'webfrontend.views.mpdcommands'),
+    url(r'^ajaxchat/', 'webfrontend.views.get_chat'),
+    url(r'^chatpush/', 'webfrontend.views.chatpush'),
 )

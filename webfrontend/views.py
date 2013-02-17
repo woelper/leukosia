@@ -4,6 +4,7 @@ import datetime
 import logging
 import urllib, urllib2
 import time
+
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.core.context_processors import csrf
@@ -165,4 +166,21 @@ def mpdcommands(request):
 	elif mpdcommand == "stop":
 		client.stop()
 	client.disconnect()
+	return HttpResponse()
+	
+def get_chat(request):
+	response = []
+	chats = Chat.objects.order_by('-c_timestamp').all()[:10]
+	for chat in chats:
+		response.append({'content':chat.c_content,'author':chat.c_username})
+	print response
+	return HttpResponse(json.dumps(response),mimetype="application/json")
+
+def chatpush(request):
+	from datetime import datetime
+	content	 = request.POST['chat_content'].encode('utf-8')
+	author = "test"
+	t = datetime.now()
+	chat_obj = Chat(c_content=content,c_username = author,c_timestamp = t)
+	chat_obj.save()
 	return HttpResponse()
