@@ -1,18 +1,21 @@
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+import time
 import datetime
 import logging
 import urllib, urllib2
-import time
 
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.core.context_processors import csrf
 from django.forms.models import model_to_dict
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 try:
     import simplejson as json
 except ImportError:
     import json
+    
 from webfrontend.models import *
 from mpd import MPDClient, MPDError, CommandError
 
@@ -44,6 +47,23 @@ API_KEY = Settings.objects.all()[0].lastfm_key.encode('utf_8')
 
 
 ### Helper Functions 
+
+#login
+def authenticate(username=None, password=None):
+	print username
+	print password
+	from django.contrib.auth import authenticate
+	user = authenticate(username=username, password=password)
+	if user is not None:
+		# the password verified for the user
+		if user.is_active:
+			msg = "User is valid, active and authenticated"
+		else:
+			msg = "The password is valid, but the account has been disabled!"
+	else:
+		# the authentication system was unable to verify the username and password
+		msg = "The username and password were incorrect."
+	return user, msg
 
 #mpd
 def get_current_song(port):
@@ -100,20 +120,21 @@ def get_lastfm_artistinfo(request):
 
 ### Controls
 
-def login(request):
+def logincontrol(request):
 	error = ""
+	
 	if request.method == 'POST':
-		cur_user = None
-		try:
-			cur_user = User.objects.get(name=request.POST['username'])
-			#set cookie!
+		username = request.POST['username'].encode('utf-8')
+		password = request.POST['password'].encode('utf-8')
+		cur_user, error = authenticate(username, password)
+		if cur_user and cur_user.is_active:
+			login(request, cur_user)
 			return HttpResponseRedirect('/radiostations')
-		except:
-			error = request.POST['username'].encode('utf-8')
 	return render_to_response('login.html',{'error':error},context_instance=RequestContext(request))
 	
 	
 def radiostations(request):
+	print str(request.user)
 	for e in STATIONS:
 
 		genres = {}

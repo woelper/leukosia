@@ -8,8 +8,8 @@
 		
 		<form name="/login" method="POST" action="/">
 			{% csrf_token %}
-			<input type="text" name="username" id="username" />
-			<input type="password" /> 
+			<input type="text" name="username" />
+			<input name="password" type="password" /> 
 			<button type="submit">Login</button>
 		</form>
 		<br>{{error}}
