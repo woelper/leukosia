@@ -134,7 +134,6 @@ def logincontrol(request):
 	
 	
 def radiostations(request):
-	print str(request.user)
 	for e in STATIONS:
 
 		genres = {}
@@ -200,7 +199,10 @@ def get_chat(request):
 def chatpush(request):
 	from datetime import datetime
 	content	 = request.POST['chat_content'].encode('utf-8')
-	author = "test"
+	if request.user.first_name != "":
+		author = request.user.first_name
+	else:
+		 author = str(request.user)
 	t = datetime.now()
 	chat_obj = Chat(c_content=content,c_username = author,c_timestamp = t)
 	chat_obj.save()
