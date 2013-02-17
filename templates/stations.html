@@ -1,0 +1,28 @@
+{% extends "master.html" %}
+{%block nav%}
+	<div class="nav" id="browse">Library</div>
+	<div class="nav" id="playqueue">Play Queue</div>
+	<div class="nav" id="nowplaying">Now Playing</div>
+	<div class="nav highlight" id="stations">Stations</div>
+{% endblock %}
+{%block content%}
+<div id="content">
+	
+	<div id="table">
+		
+		<div class="tableheader">		
+			<span class="tablecell">Name</span>
+			<span class="tablecell">Admin Port</span>
+			<span class="tablecell">Stream Port</span>
+			<span class="tablecell">Description</span>
+		</div>
+		{% for e in stations %}
+		<div class="tablerow">
+			<span class="tablecell"><a href="/nowplaying?station={{ e.admin_port }}">{{ e.stream_name }}</a></span>
+			<span class="tablecell">{{ e.admin_port }}</span>
+			<span class="tablecell">{{ e.stream_port }}</span>
+			<span class="tablecell">{{ e.description }}</span>
+		</div>
+		{% endfor %}
+</div>
+{% endblock %}

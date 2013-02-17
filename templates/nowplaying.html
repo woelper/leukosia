@@ -1,0 +1,106 @@
+{% extends "master.html" %}
+{%block nav%}
+	<div class="nav" id="browse">Library</div>
+	<div class="nav" id="playqueue">Play Queue</div>
+	<div class="nav highlight" id="nowplaying">Now Playing</div>
+	<div class="nav" id="stations">Stations</div>
+{% endblock %}
+{%block content%}
+<div id="content">
+	<!--<audio src="http://leukosia.eu:8003/" preload="auto">
+	</audio>-->
+	<div id="albumcovercontainer"><img src="{{STATIC_URL}}img/loading.gif" /></div>
+	<div id="trackinfo" style="display:none">
+		<!-- trackinfo created by ajax call -->
+	</div>
+	<div style="clear:both"></div>
+	<div id="artistinfo">
+	</div>
+</div>
+<div id="artistinfoclick">Artistinfo</div>
+<form><input id="hidden" type="hidden" value=""></form>
+
+<script type="text/javascript">
+	var html = "";
+	var last_artist = "";
+	var last_album = "";
+	var cur_artist;
+	var cur_album;
+	
+	function get_lastfm_albuminfo(artist,album) {
+		
+		$.ajax({
+			type: "POST",
+			url:  '/lastfmalbuminfo/',
+			dataType: "json",
+			data : {'artist': artist, 'album': album},
+			success: function(data, textStatus, XMLHttpRequest) {
+				$('#albumcovercontainer').html('<img id="albumcover" src="'+
+					data.albumcoverurl+'" style="border:1px solid #F8F8F8;">');		
+			}
+		});
+		
+	}
+	
+	function get_lastfm_artistinfo(artist) {
+		
+		$.ajax({
+			type: "POST",
+			url:  '/lastfmartistinfo/',
+			dataType: "json",
+			data : {'artist': artist},
+			success: function(data, textStatus, XMLHttpRequest) {
+				$('#artistinfo').html('<div id="artistimagediv">'+
+				'<img id="artistimage" src="'+data.artistimageurl+
+				'" style="border:1px solid #F8F8F8;">'+
+				'</div>'+data.artistbio);
+			}
+		});
+		
+	}
+	
+	function get_cur_song() {
+	
+		$.ajax({
+			type: "POST",
+			url:  '/nowplaying/?station={{station|safe}}' ,
+			dataType: "json",
+			success: function(data, textStatus, XMLHttpRequest) {
+				cur_artist = data.artist;
+				cur_album = data.album;
+				html = "<b>" + data.title + "</b><br><br>" +
+					"<b>" + data.artist + "</b><br>" +
+					data.album + " (" + data.date + ")<br><br>" +
+					"<span style='font-size:80%'>" +
+					"Genre: " + data.genre + "<br>" +
+					"Track: "+ data.track + "<br>" +
+					"Length: " + data.time + "<br>" +
+					"</span>"
+				$("#trackinfo").html(html);	
+			}
+		});
+		// update lastfm infos on track change
+		if (cur_album != last_album) { //if album changes
+			$('#albumcovercontainer').html('<img src="{{STATIC_URL}}img/loading.gif" />');
+			get_lastfm_albuminfo(cur_artist,cur_album);
+		}
+		last_artist = cur_artist;
+		last_album = cur_album
+	}
+	
+	$(document).ready(function () {
+		get_cur_song();
+		$('#trackinfo').show();
+		
+		setInterval(get_cur_song,2000);
+	});
+	
+	$('#artistinfoclick').click(function(){
+		
+			$('#artistinfo').slideToggle('slow');
+			if (last_artist != cur_artist) {
+				get_lastfm_artistinfo(cur_artist)
+			}
+	});
+</script>
+{% endblock %}

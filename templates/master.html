@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link type="text/css" rel="stylesheet" href="{{STATIC_URL}}css/style.css" />
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
+<title>l e u k o s i a</title>
+<meta http-equiv="Content-Language" content="en-us" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+
+
+</head>
+<body>
+<div id="header1"><img style="float:left;margin-left:30px;margin-top:-10px;" src="{{STATIC_URL}}img/logo_3	_w.png">
+	<div id="logout">
+		<a href="/logout"><img src="{{STATIC_URL}}img/logout_w.png"></a>
+	</div>
+	<div id="next" class="contr"><img src="{{STATIC_URL}}img/next_w.png"></div>
+	<div id="stop" class="contr"><img src="{{STATIC_URL}}img/stop_w.png"></div>	
+	<div id="playpause" class="contr"><img class="playpause" src="{{STATIC_URL}}img/pause_w.png"><img class="playpause" src="{{STATIC_URL}}img/play_w.png" style="display:none"></div>
+	<div id="previous" class="contr"><img src="{{STATIC_URL}}img/prev_w.png"></div>
+	<div id="broadcastinfo">{% if station_name %}{{station_name}}'s Broadcast{% endif %}</div>
+	<div id="speakerswitch">
+		<img class="speakerswitch" src="{{STATIC_URL}}img/speakeroff_w.png">
+		<img class="speakerswitch" src="{{STATIC_URL}}img/speakeron_w.png" style="display:none">
+	</div>
+</div>
+<div id="header2">
+	<div id="navbox">
+		{% block nav %}
+		
+		{% endblock %}
+	</div>
+</div>
+	
+{% block content %}
+{% endblock %}	
+<div id="footer">
+	leukosia V0.1 beta 
+</div>
+<script type="text/javascript">
+	<!-- nav -->
+	$('#speakerswitch').click(function(){
+		$('.speakerswitch').toggle();
+	});
+	$('#playpause').click(function(){
+		$('.playpause').toggle();
+	});
+	$('#stations').click(function(){
+		window.location = "/radiostations";
+	});
+	$('#nowplaying').click(function(){
+		window.location = "/nowplaying";
+	});
+	$('#playqueue').click(function(){
+		window.location = "/playqueue";
+	});
+	
+	
+	<!--MPD Commands -->
+	$('#stop').click(function() {
+		$.get('/mpdcommands?mpdcommand=stop&port='+ {{station}} );
+	});
+	$('#playpause').click(function() {
+		$.get('/mpdcommands?mpdcommand=play&port='+ {{station}} );
+	});
+	$('#next').click(function() {
+		$.get('/mpdcommands?mpdcommand=next&port='+ {{station}} );
+	});
+	$('#previous').click(function() {
+		$.get('/mpdcommands?mpdcommand=previous&port='+ {{station}} );
+	});
+	
+	$(document).ajaxSend(function(event, xhr, settings) {
+    function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+    }
+    function sameOrigin(url) {
+    // url could be relative or scheme relative or absolute
+    var host = document.location.host; // host + port
+    var protocol = document.location.protocol;
+    var sr_origin = '//' + host;
+    var origin = protocol + sr_origin;
+    // Allow absolute or scheme relative URLs to same origin
+    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+        (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+        // or any other URL that isn't scheme relative or absolute i.e relative.
+        !(/^(\/\/|http:|https:).*/.test(url));
+    }
+    function safeMethod(method) {
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+    }
+});
+</script>
+</body>
+</html>

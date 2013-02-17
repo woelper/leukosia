@@ -1,0 +1,132 @@
+html, body {
+	margin:0px;
+	padding:0px;
+	width:100%;
+	font-family: 'Open Sans', sans-serif;
+	font-size:14px;
+	background:#F8F8F8;
+	overflow:hidden;
+}
+#header1 {
+	height:50px;
+	position:fixed;
+	top:0;
+	width:100%;
+	background:#333330;
+	color:#ffffff;
+	
+}
+#header2 {
+	height:30px;
+	position:fixed;
+	top:50px;
+	width:100%;
+	background:#333330;
+	color:#ffffff;
+	-webkit-box-shadow: 0 5px 5px rgba(0, 0, 0, .35);
+	box-shadow: 0 5px 5px rgba(0, 0, 0, .35);
+}
+#logout{
+	float:right;
+	padding:15px 15px 0px 0px;
+	margin-left:50px;
+}
+#speakerswitch{
+	float:right;
+	padding:15px 15px 0px 0px;
+	margin-left:50px;
+	cursor:pointer;
+}
+#broadcastinfo {
+	float:right;
+	padding:15px 15px 0px 0px;
+	margin-right:50px;
+}
+#navbox{
+	float:right;
+	vertical-align:top;
+}
+.nav{
+	float:right;
+	height:16px;
+	cursor:pointer;
+	width:150px;
+	text-align:center;
+	padding:5px 0px 5px 0px;
+	border:1px solid #333330;
+	
+}
+.nav.highlight {
+	border-bottom:1px solid #ffffff;
+}
+.nav:hover{
+	border-bottom:1px solid #ffffff;
+}
+.contr{
+	float:right;
+	padding:15px 15px 0px 0px;
+	cursor:pointer;
+}
+#content{
+	padding:30px;
+	background:white;
+	margin-top:80px;
+	overflow:auto;
+	height:100%;
+}
+a {
+	text-decoration:none;
+	color:black;
+}
+a:hover{
+	text-decoration:underline;
+}
+a:visited {
+	color:black;
+}
+#table{
+	text-align:left;
+	display:table;
+}
+.tableheader {
+	display:table-row;
+	font-weight:bold;
+}
+.tablerow {
+	display:table-row;
+}
+.tablecell{
+	display:table-cell;
+	padding:5px 40px 10px 0px;
+}
+#albumcovercontainer {
+	width:200px;
+	height:200px;
+	float:left;
+}
+#albumcover {
+	width:200px;
+	float:left;
+}
+#trackinfo {
+	float:left;
+	margin-left:30px;
+}
+#artistinfo {
+	text-align:justify;
+	width:100%;
+	display:none;
+	background:#ffffff;
+	padding:10px;
+}
+img#artistimage {
+	width:300px;
+}
+
+#footer {
+	text-align:right;
+	position:fixed;
+	right:10px;
+	bottom:0px;
+	height:20px;
+}

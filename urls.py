@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import patterns, include, url
 
+
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
@@ -19,6 +20,6 @@ urlpatterns = patterns('',
     url(r'^nowplaying/', 'webfrontend.views.nowplaying'),
     url(r'^lastfmalbuminfo/', 'webfrontend.views.get_lastfm_albuminfo'),
     url(r'^lastfmartistinfo/', 'webfrontend.views.get_lastfm_artistinfo'),
-    url(r'^login/', 'webfrontend.views.login'),
-    url(r'^mpdcommands/', 'webfrontend.views.mpdstop'),
+    url(r'^$', 'webfrontend.views.login',name='index'),
+    url(r'^mpdcommands/', 'webfrontend.views.mpdcommands'),
 )
