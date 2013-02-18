@@ -5,62 +5,37 @@
 	<div class="nav" id="nowplaying">Now Playing</div>
 	<div class="nav" id="stations">Stations</div>
 {% endblock %}
+
+
 {%block content%}
-<div id="content">
-	<div id="table" class="draggable">
-		<div class="tableheader">
-			<span class="tablecell">#</span>		
-			<span class="tablecell">track</span>
-			<span class="tablecell">title</span>
-			<span class="tablecell">artist</span>
-			<span class="tablecell">album</span>
-			<span class="tablecell">date</span>
-			<span class="tablecell">duration</span>
-			<span class="tablecell">genre</span>
-		</div>
-		<div class="tablerow">
-			<span class="tablecell"></span>			
-			<span class="tablecell">01</span>
-			<span class="tablecell">bla bla bla bla</span>
-			<span class="tablecell">dieser</span>
-			<span class="tablecell">ein schoenes album</span>
-			<span class="tablecell">2010</span>
-			<span class="tablecell">3:24</span>
-			<span class="tablecell">rock</span>
-		</div>
-		<div class="tablerow">
-			<span class="tablecell"><img src="{{STATIC_URL}}img/play_small.png"></span>	
-			<span class="tablecell">02</span>
-			<span class="tablecell">usw</span>
-			<span class="tablecell">und so fort</span>
-			<span class="tablecell">albumtitel</span>
-			<span class="tablecell">2009</span>
-			<span class="tablecell">4:68</span>
-			<span class="tablecell">Heavy Metal</span>
-		</div>
-		<div class="tablerow">
-			<span class="tablecell"></span>	
-			<span class="tablecell">track</span>
-			<span class="tablecell">title^</span>
-			<span class="tablecell">artist</span>
-			<span class="tablecell">album</span>
-			<span class="tablecell">date</span>
-			<span class="tablecell">duration</span>
-			<span class="tablecell">genre</span>
-		</div>
-		<div class="tablerow">
-			<span class="tablecell"></span>	
-			<span class="tablecell">track</span>
-			<span class="tablecell">title^</span>
-			<span class="tablecell">artist</span>
-			<span class="tablecell">album</span>
-			<span class="tablecell">date</span>
-			<span class="tablecell">duration</span>
-			<span class="tablecell">genre</span>
-		</div>
-	</div>
+<div id="container" style="padding-top:100px";>
+	<table class="table table-condensed table-striped">
+		<thead>
+			<tr>			
+			<th>Track</th>
+			<th>Title</th>
+			<th>Artist</th>
+			<th>Album</th>
+			<th>Date</th>
+			<th>Genre</th>
+			<th>Duration</th>		
+		</tr>		
+		</thead>
+		<tbody>
+		{% for e in playlist%}
+		<tr>
+			<td>{{e.track}}</td>
+			<td>{{e.title}}</td>
+			<td>{{e.artist}}</td>
+			<td>{{e.album}}</td>
+			<td>{{e.date}}</td>
+			<td>{{e.genre}}</td>
+			<td>{{e.time}}</td>
+		</tr>
+		{% endfor %}
+		</tbody>
+	</table>
 </div>
-<div style="clear:both"></div>
 
 {%endblock%}
 

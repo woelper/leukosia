@@ -75,6 +75,18 @@ def get_current_song(port):
 	client.close()
 	client.disconnect() 
 	return cur_song
+	
+def get_current_playlist(port):
+	client = MPDClient()
+	client.connect(HOST,port)
+	client.password(PASSW)
+	cur_playlist = client.playlistinfo()
+	print cur_playlist
+	for e in cur_playlist:
+		e['time'] = str(datetime.timedelta(seconds=int(e['time'])))
+	client.close()
+	client.disconnect() 
+	return cur_playlist
 
 #lastfm
 def get_album_cover(artist,album):
@@ -164,8 +176,11 @@ def nowplaying(request):
 
 
 def playqueue(request):
-	return render_to_response('playqueue.html',{},context_instance=RequestContext(request))
-	
+	cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
+	return render_to_response('playqueue.html',{'playlist':cur_playlist},context_instance=RequestContext(request))
+
+
+### Ajax Methods
 
 def mpdcommands(request):
 	port = request.GET['port'].encode('utf-8')
