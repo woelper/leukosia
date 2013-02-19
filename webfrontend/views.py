@@ -117,6 +117,7 @@ def get_artist_image(artist):
 	data = urllib2.urlopen( url )
 	response_data = json.load( data )
 	data.close()
+	print response_data
 	return response_data['artist']['image'][3]['#text'], response_data['artist']['bio']['summary']
 
 def get_lastfm_albuminfo(request):

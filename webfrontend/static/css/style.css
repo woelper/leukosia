@@ -4,7 +4,6 @@ html, body {
 	width:100%;
 	font-family: 'Open Sans', sans-serif;
 	font-size:14px;
-	background:#F8F8F8;
 	
 }
 #header1 {
@@ -74,16 +73,6 @@ html, body {
 
 	height:100%;
 }
-a {
-	text-decoration:none;
-	color:black;
-}
-a:hover{
-	text-decoration:underline;
-}
-a:visited {
-	color:black;
-}
 #table{
 	text-align:left;
 	display:table;
@@ -115,12 +104,11 @@ a:visited {
 #artistinfo {
 	text-align:justify;
 	width:100%;
-	display:none;
 	background:#ffffff;
-	padding:10px;
 }
 img#artistimage {
 	width:300px;
+	margin-right:25px;
 }
 
 #footer {

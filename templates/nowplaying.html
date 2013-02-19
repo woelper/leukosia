@@ -14,11 +14,10 @@
 		<!-- trackinfo created by ajax call -->
 	</div>
 	<div style="clear:both"></div>
+	<hr>
 	<div id="artistinfo">
 	</div>
 </div>
-<div id="artistinfoclick">Artistinfo</div>
-<form><input id="hidden" type="hidden" value=""></form>
 
 <script type="text/javascript">
 	var html = "";
@@ -33,9 +32,9 @@
 			type: "POST",
 			url:  '/lastfmalbuminfo/',
 			dataType: "json",
-			data : {'artist': artist, 'album': album},
+			data : {'album': album, 'artist': artist},
 			success: function(data, textStatus, XMLHttpRequest) {
-				$('#albumcovercontainer').html('<img id="albumcover" src="'+
+				$('#albumcovercontainer').html('<img id="albumcover" class="img-polaroid" src="'+
 					data.albumcoverurl+'" style="border:1px solid #F8F8F8;">');		
 			}
 		});
@@ -51,7 +50,7 @@
 			data : {'artist': artist},
 			success: function(data, textStatus, XMLHttpRequest) {
 				$('#artistinfo').html('<div id="artistimagediv">'+
-				'<img id="artistimage" src="'+data.artistimageurl+
+				'<img id="artistimage" class="img-rounded pull-left" src="'+data.artistimageurl+
 				'" style="border:1px solid #F8F8F8;">'+
 				'</div>'+data.artistbio);
 			}
@@ -59,7 +58,7 @@
 		
 	}
 	
-	function get_cur_song() {
+	function update_nowplaying() {
 	
 		$.ajax({
 			type: "POST",
@@ -77,30 +76,26 @@
 					"Length: " + data.time + "<br>" +
 					"</span>"
 				$("#trackinfo").html(html);	
+				$('#trackinfo').show();
+				
+				if (cur_album != last_album) { //if album changes
+					$('#albumcovercontainer').html('<img src="{{STATIC_URL}}img/loading.gif" />');
+					get_lastfm_albuminfo(cur_artist,cur_album);
+				}
+				if (last_artist != cur_artist) { //if album changes
+					$('#artistinfo').html('<img src="{{STATIC_URL}}img/loading.gif" />');
+					get_lastfm_artistinfo(cur_artist);
+				}
+				last_artist = cur_artist;
+				last_album = cur_album 
 			}
+				
 		});
-		// update lastfm infos on track change
-		if (cur_album != last_album) { //if album changes
-			$('#albumcovercontainer').html('<img src="{{STATIC_URL}}img/loading.gif" />');
-			get_lastfm_albuminfo(cur_artist,cur_album);
-		}
-		last_artist = cur_artist;
-		last_album = cur_album
 	}
-	
+		
 	$(document).ready(function () {
-		get_cur_song();
-		$('#trackinfo').show();
-		
-		setInterval(get_cur_song,2000);
-	});
-	
-	$('#artistinfoclick').click(function(){
-		
-			$('#artistinfo').slideToggle('slow');
-			if (last_artist != cur_artist) {
-				get_lastfm_artistinfo(cur_artist)
-			}
+		update_nowplaying();
+		setInterval(update_nowplaying,5000);
 	});
 </script>
 {% endblock %}
