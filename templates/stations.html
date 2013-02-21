@@ -6,20 +6,22 @@
 	<div class="nav highlight" id="stations">Stations</div>
 {% endblock %}
 {%block content%}
-<div id="content">
+<div class="content">
 	
-	<div id="table">
-		
-		<div class="tableheader">
-			<span class="tablecell"></span>
-			<span class="tablecell">Name</span>
-			<span class="tablecell">Admin Port</span>
-			<span class="tablecell">Stream Port</span>
-			<span class="tablecell">Description</span>
-		</div>
+	<table class="table">
+		<thead>
+		<tr>
+			<th></th>
+			<th>Name</th>
+			<th>Admin Port</th>
+			<th>Stream Port</th>
+			<th>Description</th>
+		</tr>
+		</thead>
 		{% for e in stations %}
-		<div class="tablerow">
-			<span class="tablecell">	
+		<tr>
+			<tbody>
+				<td>	
 				
 				<!-- BEGINS: AUTO-GENERATED Museter unlimited SHOUTcast Hosting Museter.com plans start at $6.95 CODE visit http://www.museter.com -->
 <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="180" height="30" bgcolor="#FFFFFF">
@@ -35,19 +37,18 @@
 					<source src="http://leukosia.eu:{{ e.stream_port }}/" type="audio/mpeg">
 					<p>Your browser does not support native audio, but you can <a href="http://leukosia.eu:{{ e.stream_port }}/">download this MP3</a> to listen on your device.</p>
 				</audio> -->
-			</span>
+			</td>
 
-			<span class="tablecell"><a href="/nowplaying?station_port={{ e.admin_port }}">{{ e.stream_name }}</a></span>
-			<span class="tablecell">{{ e.admin_port }}</span>
-			<span class="tablecell">{{ e.stream_port }}</span>
-			<span class="tablecell">{{ e.description }} *** es laeuft: {{ e.genre }}</span>
-			<span class="tablecell">	
-		</div>
+			<td><a href="/nowplaying?station_port={{ e.admin_port }}">{{ e.stream_name }}</a></td>
+			<td>{{ e.admin_port }}</td>
+			<td>{{ e.stream_port }}</td>
+			<td>{{ e.description }} *** es laeuft: {{ e.genre }}</span>
+			<td></td>	
+		</tr>
 
 		{% endfor %}
-		<input type="text" id="chatcontent" name="chatcontent">
-		<button type="submit" onclick=push_chat()></button>
-		
+		</tbody>	
+		</table>
 		
 		
 </div>

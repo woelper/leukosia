@@ -21,7 +21,7 @@
   </head>
 
   <body>
-  
+   
 	<div class="navbar navbar-inverse navbar-fixed-top">
 		<div class="navbar-inner">
 			<div class="container-fluid">
@@ -36,7 +36,7 @@
                       <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Station <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                          <li><a href="#">All</a></li>
+                          <li><a href="/radiostations">All</a></li>
                           <li class="divider"></li>
                           <li><a href="#">Name2</a></li>
                           <li><a href="#">Name3</a></li>
@@ -48,23 +48,13 @@
 
 			</div>
 		</div>
-	</div>
-	<div class="container-fluid">
-		<div class="row-fluid">
-			<div class=" content content-left span9">
-				<div>
-				<ul class="nav nav-tabs">
-				  <li class="active"><a href="#">Now Playing</a></li>
-				  <li><a href="#">Artistinfo</a></li>
-				  <li><a href="#">Play Queue</a></li>
-				  <li><a href="#">Playlists</a></li>
-				  <li><a href="#">Database</a></li>
-				  <li><a href="#">sonstwas</a></li>
-				</ul>
-				</div>
-			
-			</div>
-			
+	</div> <!-- /navbar -->
+
+	{% block content %}
+	{% endblock %}
+
+
+			{% if not login %}
 			<div class="span3">
 				<div class="content content-right">
 				<h3>...Player...</h3>
@@ -76,16 +66,16 @@
 				  <div id="chat">chat hier</div>
 				</div>
 			</div>
-		
-		</div> <!-- /row -->
+			{% endif %}
 
-    </div> <!-- /container -->
 	
 
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="{{STATIC_URL}}ext/bootstrap/js/bootstrap.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    
     
     <script type="text/javascript">
 	<!-- nav -->

@@ -7,24 +7,18 @@
 	<div id="logincontainer">
 		<div class="container-fluid">
 		
-      <form class="form-signin" name="/login" method="POST" action="/">
-		{% csrf_token %}
-		<h3 class="form-signin-heading">sign in or fuck off</h3>
-        <input name="username" type="text" class="input input-xlarge" placeholder="Username"><br>
-        <input name="password" type="password" class="input input-xlarge" placeholder="Password">
-        <label class="checkbox">
-          <input type="checkbox" value="remember-me"> Remember me
-        </label>
-        <button class="btn btn-primary" type="submit">Sign in</button>
-      </form>
-
-    </div> <!-- /container -->
-		<form name="/login" method="POST" action="/">
+		  <form class="form-signin" name="/login" method="POST" action="/">
 			{% csrf_token %}
-			<input type="text" name="username" />
-			<input  type="password" /> 
-			<button type="submit">Login</button>
-		</form>
+			<h3 class="form-signin-heading">sign in or fuck off</h3>
+			<input name="username" type="text" class="input input-xlarge" placeholder="Username"><br>
+			<input name="password" type="password" class="input input-xlarge" placeholder="Password">
+			<label class="checkbox">
+			  <input type="checkbox" value="remember-me"> Remember me
+			</label>
+			<button class="btn btn-primary" type="submit">Sign in</button>
+		  </form>
+
+		</div> <!-- /container -->
 		<br>{{error}}
 	</div>
 </div>
