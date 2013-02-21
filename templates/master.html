@@ -21,7 +21,7 @@
   </head>
 
   <body>
-  
+   
 	<div class="navbar navbar-inverse navbar-fixed-top">
 		<div class="navbar-inner">
 			<div class="container-fluid">
@@ -48,9 +48,25 @@
 
 			</div>
 		</div>
-	</div>
+	</div> <!-- /navbar -->
+
 	{% block content %}
 	{% endblock %}
+
+
+			{% if not login %}
+			<div class="span3">
+				<div class="content content-right">
+				<h3>...Player...</h3>
+				<br>
+				<hr>
+				  <input id="appendedInputButton" type="text" name="chatcontent">
+				  <button class="btn" type="button">Bla!</button>
+				  </input>
+				  <div id="chat">chat hier</div>
+				</div>
+			</div>
+			{% endif %}
 
 	
 

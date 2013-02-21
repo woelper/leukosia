@@ -143,7 +143,7 @@ def logincontrol(request):
 		if cur_user and cur_user.is_active:
 			login(request, cur_user)
 			return HttpResponseRedirect('/radiostations')
-	return render_to_response('login.html',{'error':error},context_instance=RequestContext(request))
+	return render_to_response('login.html',{'error':error,'login':True},context_instance=RequestContext(request))
 	
 	
 def radiostations(request):
