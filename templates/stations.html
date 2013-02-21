@@ -1,56 +1,51 @@
 {% extends "master.html" %}
-{%block nav%}
-	<div class="nav" id="browse">Library</div>
-	<div class="nav" id="playqueue">Play Queue</div>
-	<div class="nav" id="nowplaying">Now Playing</div>
-	<div class="nav highlight" id="stations">Stations</div>
-{% endblock %}
 {%block content%}
-<div class="content">
-	
-	<table class="table">
-		<thead>
-		<tr>
-			<th></th>
-			<th>Name</th>
-			<th>Admin Port</th>
-			<th>Stream Port</th>
-			<th>Description</th>
-		</tr>
-		</thead>
-		{% for e in stations %}
-		<tr>
-			<tbody>
-				<td>	
-				
-				<!-- BEGINS: AUTO-GENERATED Museter unlimited SHOUTcast Hosting Museter.com plans start at $6.95 CODE visit http://www.museter.com -->
-<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="180" height="30" bgcolor="#FFFFFF">
-<param name="movie" value="http://www.museter.com/ffmp3-config.swf" />
-<param name="flashvars" value="url=http://leukosia.eu:8000&lang=en&codec=mp3&volume=65&introurl=&traking=false&jsevents=false&buffering=1&skin=http://www.museter.com/skins/substream/ffmp3-substream.xml&title=digga&welcome=WELCOME%20TO..." />
-<param name="wmode" value="window" />
-<param name="allowscriptaccess" value="always" />
-<param name="scale" value="noscale" />
-<embed src="http://www.museter.com/ffmp3-config.swf" flashvars="url=http://leukosia.eu:{{ e.stream_port }}&lang=en&codec=mp3&volume=65&introurl=&traking=false&jsevents=false&buffering=1&skin=http://www.museter.com/skins/substream/ffmp3-substream.xml&title=digga&welcome=WELCOME%20TO..." width="180" scale="noscale" height="30" wmode="transparent" bgcolor="#FFFFFF" allowscriptaccess="always" type="application/x-shockwave-flash" />
-</object>
-<!-- ENDS: AUTO-GENERATED Museter unlimited SHOUTcast Hosting Museter.com plans start at $6.95 CODE visit http://www.museter.com-->
-				<!--<audio controls preload="none">
-					<source src="http://leukosia.eu:{{ e.stream_port }}/" type="audio/mpeg">
-					<p>Your browser does not support native audio, but you can <a href="http://leukosia.eu:{{ e.stream_port }}/">download this MP3</a> to listen on your device.</p>
-				</audio> -->
-			</td>
+ <div class="container-fluid">
+		<div class="row-fluid">
+			<div class="content">
 
-			<td><a href="/nowplaying?station_port={{ e.admin_port }}">{{ e.stream_name }}</a></td>
-			<td>{{ e.admin_port }}</td>
-			<td>{{ e.stream_port }}</td>
-			<td>{{ e.description }} *** es laeuft: {{ e.genre }}</span>
-			<td></td>	
-		</tr>
+				<table class="table">
+					<thead>
+					<tr>
+						<th></th>
+						<th>Name</th>
+						<th>Admin Port</th>
+						<th>Stream Port</th>
+						<th>Description</th>
+					</tr>
+					</thead>
+					{% for e in stations %}
+					<tr>
+						<tbody>
+							<td>	
+							
+							<!-- BEGINS: AUTO-GENERATED Museter unlimited SHOUTcast Hosting Museter.com plans start at $6.95 CODE visit http://www.museter.com -->
+								<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="180" height="30" bgcolor="#FFFFFF">
+								<param name="movie" value="http://www.museter.com/ffmp3-config.swf" />
+								<param name="flashvars" value="url=http://leukosia.eu:8000&lang=en&codec=mp3&volume=65&introurl=&traking=false&jsevents=false&buffering=1&skin=http://www.museter.com/skins/substream/ffmp3-substream.xml&title=digga&welcome=WELCOME%20TO..." />
+								<param name="wmode" value="window" />
+								<param name="allowscriptaccess" value="always" />
+								<param name="scale" value="noscale" />
+								<embed src="http://www.museter.com/ffmp3-config.swf" flashvars="url=http://leukosia.eu:{{ e.stream_port }}&lang=en&codec=mp3&volume=65&introurl=&traking=false&jsevents=false&buffering=1&skin=http://www.museter.com/skins/substream/ffmp3-substream.xml&title=digga&welcome=WELCOME%20TO..." width="180" scale="noscale" height="30" wmode="transparent" bgcolor="#FFFFFF" allowscriptaccess="always" type="application/x-shockwave-flash" />
+								</object>
+								<!-- ENDS: AUTO-GENERATED Museter unlimited SHOUTcast Hosting Museter.com plans start at $6.95 CODE visit http://www.museter.com-->
+							<!--<audio controls preload="none">
+								<source src="http://leukosia.eu:{{ e.stream_port }}/" type="audio/mpeg">
+								<p>Your browser does not support native audio, but you can <a href="http://leukosia.eu:{{ e.stream_port }}/">download this MP3</a> to listen on your device.</p>
+							</audio> -->
+						</td>
+						<td><a href="/nowplaying?station_port={{ e.admin_port }}">{{ e.stream_name }}</a></td>
+						<td>{{ e.admin_port }}</td>
+						<td>{{ e.stream_port }}</td>
+						<td>{{ e.description }} *** es laeuft: {{ e.genre }}</span>
+						<td></td>	
+					</tr>
 
-		{% endfor %}
-		</tbody>	
-		</table>
-		
-		
-</div>
+					{% endfor %}
+				</tbody>	
+			</table>
+
+		</div>
+
 
 {% endblock %}

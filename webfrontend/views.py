@@ -172,8 +172,10 @@ def nowplaying(request):
 	for e in STATIONS:
 		if e['admin_port'] == int(station_port):
 			station_name = e['stream_name']
+			
+	cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
 
-	return render_to_response('nowplaying.html',{'cur_song':current_song,'station_port':station_port,'station_name':station_name},context_instance=RequestContext(request))
+	return render_to_response('nowplaying.html',{'cur_song':current_song,'station_port':station_port,'station_name':station_name,'playlist':cur_playlist},context_instance=RequestContext(request))
 
 
 def playqueue(request):

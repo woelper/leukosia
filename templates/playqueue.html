@@ -9,32 +9,7 @@
 
 {%block content%}
 <div id="container" style="padding-top:100git aptpx";>
-	<table class="table table-condensed table-striped">
-		<thead>
-			<tr>			
-			<th>Track</th>
-			<th>Title</th>
-			<th>Artist</th>
-			<th>Album</th>
-			<th>Date</th>
-			<th>Genre</th>
-			<th>Duration</th>		
-		</tr>		
-		</thead>
-		<tbody>
-		{% for e in playlist%}
-		<tr>
-			<td>{{e.track}}</td>
-			<td>{{e.title}}</td>
-			<td>{{e.artist}}</td>
-			<td>{{e.album}}</td>
-			<td>{{e.date}}</td>
-			<td>{{e.genre}}</td>
-			<td>{{e.time}}</td>
-		</tr>
-		{% endfor %}
-		</tbody>
-	</table>
+	
 </div>
 
 {%endblock%}

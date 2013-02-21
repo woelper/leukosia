@@ -4,32 +4,71 @@
 
 		<div class="row-fluid">
 		
-			<div class=" content content-left span9">
-			
-			<ul class="nav nav-tabs">
-			  <li class="active"><a href="#">Now Playing</a></li>
-			  <li><a href="#">Artistinfo</a></li>
-			  <li><a href="#">Play Queue</a></li>
-			  <li><a href="#">Playlists</a></li>
-			  <li><a href="#">Database</a></li>
-			  <li><a href="#">sonstwas</a></li>
-			</ul>
-			
-			<!--<audio src="http://leukosia.eu:8003/" preload="auto">
-			</audio>-->
-			<div id="albumcovercontainer" class="pull-left"><img src="{{STATIC_URL}}img/loading.gif" /></div>
-			<div id="trackinfo" style="display:none" class="pull-left">
-				<!-- trackinfo created by ajax call -->
-			</div>
-			<div style="clear:both"></div>
-			<hr>
-			<div id="artistinfo">
-			</div>
+			<div class="content content-left span9">
+				
+				<div class="tabbable">
+					<ul class="nav nav-tabs">
+					  <li class="active"><a href="#tab1" data-toggle="tab">Now Playing</a></li>
+					  <li><a href="#tab2" data-toggle="tab">Artistinfo</a></li>
+					  <li><a href="#tab3" data-toggle="tab">Play Queue</a></li>
+					  <li><a href="#tab4" data-toggle="tab">Playlists</a></li>
+					  <li><a href="#tab5" data-toggle="tab">Now Playing</a></li>
+					  <li><a href="#tab6" data-toggle="tab">Now Playing</a></li>
+					</ul>
+					
+					<div class="tab-content">
+						<div class="tab-pane active" id="tab1">
+							<div id="albumcovercontainer" class="pull-left">
+								<img src="{{STATIC_URL}}img/loading.gif" />
+							</div>
+							<div id="trackinfo" style="display:none" class="pull-left">
+								<!-- trackinfo created by ajax call -->
+							</div>
+						</div>
+						
+						<div class="tab-pane" id="tab2">
+							<div id="artistinfo">
+							</div>
+						</div>
+						
+						<div class="tab-pane" id="tab3">
+							<table class="table table-condensed table-striped">
+								<thead>
+									<tr>			
+									<th>Track</th>
+									<th>Title</th>
+									<th>Artist</th>
+									<th>Album</th>
+									<th>Date</th>
+									<th>Genre</th>
+									<th>Duration</th>		
+								</tr>		
+								</thead>
+								<tbody>
+								{% for e in playlist%}
+								<tr>
+									<td>{{e.track}}</td>
+									<td>{{e.title}}</td>
+									<td>{{e.artist}}</td>
+									<td>{{e.album}}</td>
+									<td>{{e.date}}</td>
+									<td>{{e.genre}}</td>
+									<td>{{e.time}}</td>
+								</tr>
+								{% endfor %}
+								</tbody>
+							</table>
+							
+						</div>
+					</div>
+				</div>
+				
+			</div> <!-- /content --> 
 
 		
-		</div> <!-- /row -->
+		
 
-    </div> <!-- /container -->
+    
 
     <!-- Le javascript
     ================================================== -->

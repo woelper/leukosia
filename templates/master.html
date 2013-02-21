@@ -55,20 +55,22 @@
 
 
 			{% if not login %}
+			
 			<div class="span3">
 				<div class="content content-right">
 				<h3>...Player...</h3>
 				<br>
 				<hr>
-				  <input id="appendedInputButton" type="text" name="chatcontent">
-				  <button class="btn" type="button">Bla!</button>
+				  <input id="appendedInputButton" type="text" id="chatcontent" name="chatcontent">
+					<button id="chatpush" class="btn" type="button">Bla!</button>
 				  </input>
 				  <div id="chat">chat hier</div>
 				</div>
 			</div>
 			{% endif %}
 
-	
+		</div>
+	</div>
 
     <!-- Le javascript
     ================================================== -->
@@ -176,8 +178,12 @@
 		setInterval(update_chat,5000);
 	});
 	
+	$('chatpush').click(function() {
+		push_chat();
+		});
 	function push_chat() {
 		content = document.getElementById('chatcontent').value;
+		alert(content);
 		$.ajax({
 			type: "POST",
 			url:  '/chatpush/',
