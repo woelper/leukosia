@@ -60,6 +60,18 @@
 							</table>
 							
 						</div>
+						<div class="tab-pane" id="tab4">
+							<div id="artistinfo">
+							</div>
+						</div>
+						<div class="tab-pane" id="tab5">
+							<div id="artistinfo">
+							</div>
+						</div>
+						<div class="tab-pane" id="tab6">
+							<div id="artistinfo">
+							</div>
+						</div>
 					</div>
 				</div>
 				
@@ -80,17 +92,37 @@
 	var cur_artist;
 	var cur_album;
 	
-	function get_lastfm_albuminfo(artist,album) {
+	function update_albumcover(artist,album) {
 		
-		$.ajax({
-			type: "POST",
-			url:  '/lastfmalbuminfo/',
-			dataType: "json",
-			data : {'album': album, 'artist': artist},
-			success: function(data, textStatus, XMLHttpRequest) {
-				$('#albumcovercontainer').html('<img id="albumcover" class="img-polaroid" src="'+
-					data.albumcoverurl+'" style="border:1px solid #F8F8F8;">');		
-			}
+		$.getJSON("{{lastfm_url}}",{
+          "api_key":  "{{lastfm_key}}",
+          "format":   "json",
+          "artist":artist,
+          "album":album,
+          "method":"album.getInfo"
+        })
+        .done(function(data) {
+			$('#albumcovercontainer').html('<img id="albumcover" class="img-polaroid" src="'+
+					data['album']['image'][3]['#text']+'" style="border:1px solid #F8F8F8;">');	
+		});
+		
+	}
+	
+	function update_artistinfo(artist) {
+		
+		$.getJSON("{{lastfm_url}}",{
+          "api_key":  "{{lastfm_key}}",
+          "format":   "json",
+          "artist": artist,
+          "method": "artist.getInfo"
+        })
+        .done(function(data) {
+			$('#artistinfo').html('<div id="artistimagediv">'+
+				'<img id="artistimage" class="img-rounded pull-left" src="'+
+				data['artist']['image'][3]['#text']+
+				'" style="border:1px solid #F8F8F8;">'+
+				'</div>'+
+				data['artist']['bio']['summary']);
 		});
 		
 	}
@@ -102,7 +134,7 @@
 			url:  '/lastfmartistinfo/',
 			dataType: "json",
 			data : {'artist': artist},
-			success: function(data, textStatus, XMLHttpRequest) {
+			success: function(data) {
 				$('#artistinfo').html('<div id="artistimagediv">'+
 				'<img id="artistimage" class="img-rounded pull-left" src="'+data.artistimageurl+
 				'" style="border:1px solid #F8F8F8;">'+
@@ -134,11 +166,11 @@
 				
 				if (cur_album != last_album) { //if album changes
 					$('#albumcovercontainer').html('<img src="{{STATIC_URL}}img/loading.gif" />');
-					get_lastfm_albuminfo(cur_artist,cur_album);
+					update_albumcover(cur_artist,cur_album);
 				}
 				if (last_artist != cur_artist) { //if album changes
 					$('#artistinfo').html('<img src="{{STATIC_URL}}img/loading.gif" />');
-					get_lastfm_artistinfo(cur_artist);
+					update_artistinfo(cur_artist);
 				}
 				last_artist = cur_artist;
 				last_album = cur_album 

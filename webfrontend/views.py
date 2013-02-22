@@ -39,8 +39,8 @@ for e in Stations.objects.all():
 	
 
 #last.fm settings
-API_URL = Settings.objects.all()[0].lastfm_url.encode('utf_8')
-API_KEY = Settings.objects.all()[0].lastfm_key.encode('utf_8')
+LASTFM_API_URL = Settings.objects.all()[0].lastfm_url.encode('utf_8')
+LASTFM_API_KEY = Settings.objects.all()[0].lastfm_key.encode('utf_8')
 
 
 
@@ -88,48 +88,6 @@ def get_current_playlist(port):
 	client.disconnect() 
 	return cur_playlist
 
-#lastfm
-def get_album_cover(artist,album):
-	
-	kwargs={}
-	kwargs.update({
-          "api_key":  API_KEY,
-          "format":   "json",
-          "artist":artist,
-          "album":album,
-          "method":"album.getInfo"
-        })
-	url = API_URL + "?" + urllib.urlencode(kwargs)
-	data = urllib2.urlopen( url )
-	response_data = json.load( data )
-	data.close()
-	return response_data['album']['image'][3]['#text']
-
-def get_artist_image(artist):
-	kwargs={}
-	kwargs.update({
-          "api_key" : API_KEY,
-          "format" : "json",
-          "artist" : artist,
-          "method" : "artist.getInfo"
-        })
-	url = API_URL + "?" + urllib.urlencode(kwargs)
-	data = urllib2.urlopen( url )
-	response_data = json.load( data )
-	data.close()
-	print response_data
-	return response_data['artist']['image'][3]['#text'], response_data['artist']['bio']['summary']
-
-def get_lastfm_albuminfo(request):
-	albumcoverurl = get_album_cover(request.POST['artist'],request.POST['album'])
-	response =  {'albumcoverurl':albumcoverurl}
-	return HttpResponse(json.dumps(response),mimetype="application/json")
-
-def get_lastfm_artistinfo(request):
-	artistimageurl, artistbio = get_artist_image(request.POST['artist'])
-	response =  {'artistimageurl':artistimageurl,'artistbio':artistbio}
-	return HttpResponse(json.dumps(response),mimetype="application/json")
-
 
 ### Controls
 
@@ -175,7 +133,7 @@ def nowplaying(request):
 			
 	cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
 
-	return render_to_response('nowplaying.html',{'cur_song':current_song,'station_port':station_port,'station_name':station_name,'playlist':cur_playlist},context_instance=RequestContext(request))
+	return render_to_response('nowplaying.html',{'lastfm_key':LASTFM_API_KEY,'lastfm_url':LASTFM_API_URL,'cur_song':current_song,'station_port':station_port,'station_name':station_name,'playlist':cur_playlist},context_instance=RequestContext(request))
 
 
 def playqueue(request):
@@ -183,7 +141,7 @@ def playqueue(request):
 	return render_to_response('playqueue.html',{'playlist':cur_playlist},context_instance=RequestContext(request))
 
 
-### Ajax Methods
+### Ajax
 
 def mpdcommands(request):
 	port = request.GET['port'].encode('utf-8')
