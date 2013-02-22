@@ -50,8 +50,6 @@ LASTFM_API_KEY = Settings.objects.all()[0].lastfm_key.encode('utf_8')
 
 #login
 def authenticate(username=None, password=None):
-	print username
-	print password
 	from django.contrib.auth import authenticate
 	user = authenticate(username=username, password=password)
 	if user is not None:
@@ -81,7 +79,6 @@ def get_current_playlist(port):
 	client.connect(HOST,port)
 	client.password(PASSW)
 	cur_playlist = client.playlistinfo()
-	print cur_playlist
 	for e in cur_playlist:
 		e['time'] = str(datetime.timedelta(seconds=int(e['time'])))
 	client.close()
@@ -125,15 +122,16 @@ def nowplaying(request):
 	station_port = request.GET['station_port']
 	
 	current_song = get_current_song(station_port.encode('utf-8'))
-	if request.method == 'POST':
+	if request.is_ajax():
 		return HttpResponse(json.dumps(current_song),mimetype="application/json")
-	for e in STATIONS:
-		if e['admin_port'] == int(station_port):
-			station_name = e['stream_name']
-			
-	cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
+	else:
+		for e in STATIONS:
+			if e['admin_port'] == int(station_port):
+				station_name = e['stream_name']
+				
+		cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
 
-	return render_to_response('nowplaying.html',{'lastfm_key':LASTFM_API_KEY,'lastfm_url':LASTFM_API_URL,'cur_song':current_song,'station_port':station_port,'station_name':station_name,'playlist':cur_playlist},context_instance=RequestContext(request))
+		return render_to_response('nowplaying.html',{'lastfm_key':LASTFM_API_KEY,'lastfm_url':LASTFM_API_URL,'cur_song':current_song,'station_port':station_port,'station_name':station_name,'playlist':cur_playlist},context_instance=RequestContext(request))
 
 
 def playqueue(request):
@@ -168,8 +166,7 @@ def get_chat(request):
 	response = []
 	chats = Chat.objects.order_by('-c_timestamp').all()[:10]
 	for chat in chats:
-		response.append({'content':chat.c_content,'author':chat.c_username})
-	print response
+		response.append({'content':chat.c_content,'author':chat.c_username,'timestamp':str(chat.c_timestamp)})
 	return HttpResponse(json.dumps(response),mimetype="application/json")
 
 def chatpush(request):

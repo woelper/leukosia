@@ -2,7 +2,7 @@
 {%block content%}
  <div class="container-fluid">
 		<div class="row-fluid">
-			<div class="content">
+			<div class="content content-left span9">
 
 				<table class="table">
 					<thead>
@@ -14,9 +14,10 @@
 						<th>Description</th>
 					</tr>
 					</thead>
+					<tbody>
 					{% for e in stations %}
 					<tr>
-						<tbody>
+						
 							<td>	
 							
 							<!-- BEGINS: AUTO-GENERATED Museter unlimited SHOUTcast Hosting Museter.com plans start at $6.95 CODE visit http://www.museter.com -->
@@ -40,12 +41,10 @@
 						<td>{{ e.description }} *** es laeuft: {{ e.genre }}</span>
 						<td></td>	
 					</tr>
-
 					{% endfor %}
 				</tbody>	
 			</table>
-
-		</div>
+		</div> <!-- /content -->
 
 
 {% endblock %}

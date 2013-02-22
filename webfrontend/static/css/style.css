@@ -1,7 +1,6 @@
 body {
 	padding-top: 40px;
 	padding-bottom: 40px;
-	background-color: #f5f5f5;
 }
 .form-signin {
 	margin:auto;
@@ -21,12 +20,14 @@ body {
 	-moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
 	box-shadow: 0 1px 2px rgba(0,0,0,.05);
 }
-albumcovercontainer{
-	width:300px;
-	height:300px;
+.imgcontainer{
+	width:250px;
+	margin-right:25px;
 }
 .content {
-	color:black;
 	padding:10px;
-	border:1px dotted #dddddd;
+}
+img.lastfm {
+	height:250px;
+	width:250px;
 }
