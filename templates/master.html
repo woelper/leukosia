@@ -34,15 +34,23 @@
 					</p>
 					<ul class="nav">
                       <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Station <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% if station_name %}Broadcast: {{ station_name }}{% else %}Broadcasts{% endif %}<b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                          <li><a href="/radiostations">All</a></li>
-                          <li class="divider"></li>
+                          {% if station_name %}
+                          <li><a href="/radiostations">Overview</a></li>
+                          <li class="divider">Go To:</li>
+                          {% endif %}
                           <li><a href="#">Name2</a></li>
                           <li><a href="#">Name3</a></li>
                         </ul>
                       </li>
                     </ul>
+                    
+                    <p class="navbar-text">
+						
+					</p>
+                    
+                    
 					
 					
 

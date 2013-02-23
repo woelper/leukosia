@@ -115,13 +115,17 @@ def radiostations(request):
 			except:
 				genre = "nix"
 		e['genre'] = genre
-	return render_to_response('stations.html',{'stations':STATIONS},context_instance=RequestContext(request))
+	return render_to_response('stations.html',
+			{'stations':STATIONS,
+			'station_name':False},
+			context_instance=RequestContext(request))
 
 
 def nowplaying(request):
 	station_port = request.GET['station_port']
 	
 	current_song = get_current_song(station_port.encode('utf-8'))
+	
 	if request.is_ajax():
 		return HttpResponse(json.dumps(current_song),mimetype="application/json")
 	else:
@@ -131,7 +135,14 @@ def nowplaying(request):
 				
 		cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
 
-		return render_to_response('nowplaying.html',{'lastfm_key':LASTFM_API_KEY,'lastfm_url':LASTFM_API_URL,'cur_song':current_song,'station_port':station_port,'station_name':station_name,'playlist':cur_playlist},context_instance=RequestContext(request))
+		return render_to_response('nowplaying.html',
+				{'lastfm_key':LASTFM_API_KEY,
+				'lastfm_url':LASTFM_API_URL,
+				'cur_song':current_song,
+				'station_port':station_port,
+				'station_name':station_name,
+				'playlist':cur_playlist},
+				context_instance=RequestContext(request))
 
 
 def playqueue(request):
@@ -166,7 +177,8 @@ def get_chat(request):
 	response = []
 	chats = Chat.objects.order_by('-c_timestamp').all()[:10]
 	for chat in chats:
-		response.append({'content':chat.c_content,'author':chat.c_username,'timestamp':str(chat.c_timestamp)})
+		chattime = str(chat.c_timestamp)[:10] + ", " + str(chat.c_timestamp)[11:16]
+		response.append({'content':chat.c_content,'author':chat.c_username,'timestamp':chattime})
 	return HttpResponse(json.dumps(response),mimetype="application/json")
 
 def chatpush(request):

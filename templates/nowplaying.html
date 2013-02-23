@@ -18,6 +18,7 @@
 					
 					<div class="tab-content">
 						<div class="tab-pane active" id="tab1">
+							
 							<div id="albumcovercontainer" class="pull-left imgcontainer">
 								<img src="{{STATIC_URL}}img/loading.gif" />
 							</div>
@@ -124,11 +125,19 @@
           "method": "artist.getInfo"
         })
         .done(function(data) {
+			tags = "";
+			for (i in data['artist']['tags']['tag']) {
+				tags = tags + data['artist']['tags']['tag'][i]['name'] + ", ";
+			}
+			tags = tags.substring(0, tags.length - 2);
 			$('#artistinfo').html('<div class="pull-left imgcontainer">' +
 				'<img id="artistimage" class="img-polaroid pull-left " src="'+
 				data['artist']['image'][3]['#text']+
 				'" style="border:1px solid #F8F8F8;">'+
 				'</div>'+
+				"<p><strong>" + data['artist']['name'] + "</strong>" +
+				//data['artist']['bio']['formationlist']['formation']['yearfrom'] +
+				"<br><em>" + tags + "</em><br></p>" +
 				data['artist']['bio']['summary']);
 		});
 		
