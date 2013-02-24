@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
   <head>
+	  
     <meta charset="utf-8">
     <title>leukosia</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,16 +13,11 @@
     <!-- Le styles -->
     <link href="{{STATIC_URL}}ext/bootstrap/css/bootstrap.css" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="{{STATIC_URL}}css/style.css" />
-    <style type="text/css">
-		
-     
-	  
-    </style>
 
   </head>
 
   <body>
-   
+
 	<div class="navbar navbar-inverse navbar-fixed-top">
 		<div class="navbar-inner">
 			<div class="container-fluid">
@@ -29,60 +25,44 @@
 					<div class="pull-left">
 						<img src="{{STATIC_URL}}img/logo_4_w.png">
 					</div>
+					
+					{% if page != "login" %}
 					<p class="navbar-text pull-right">
 						logged in as <a class="navbar-link" href="#">username</a>
 					</p>
-					<ul class="nav">
-                      <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% if station_name %}Broadcast: {{ station_name }}{% else %}Broadcasts{% endif %}<b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                          {% if station_name %}
-                          <li><a href="/radiostations">Overview</a></li>
-                          <li class="divider">Go To:</li>
-                          {% endif %}
-                          <li><a href="#">Name2</a></li>
-                          <li><a href="#">Name3</a></li>
-                        </ul>
-                      </li>
+					{% endif%}
+					<ul class="nav" id="nav">
                     </ul>
-                    
-                    <p class="navbar-text">
-						
-					</p>
-                    
-                    
-					
-					
-
 			</div>
 		</div>
 	</div> <!-- /navbar -->
-
-	{% block content %}
-	{% endblock %}
-
-
-			{% if not login %}
-			
-			<div class="span3">
-				<div class="content content-right">
-				<h3>...Player...</h3>
-				<br>
-				<hr>
-				<form action="" method="post" onsubmit="push_chat();return false;">
-					<div class="input-append">
-					  <input id="chatcontent" name="chatcontent" type="text">
-					  <button id="chatbutton" class="btn" type="submit">Chat</button>
+	
+	 <div class="container-fluid">
+		<div class="row-fluid">
+			<div class="content content-left span9" id="content">
+				{%block content%}
+				{% endblock %}
+			</div> <!-- /content-left -->
+			{% if page != "login" %}
+			<div class="span3 content-right">
+					<h3>...Player...</h3>
+					<br>
+					<hr>
+					<form action="" method="post" onsubmit="push_chat();return false;">
+						<div class="input-append">
+						  <input id="chatcontent" name="chatcontent" type="text">
+						  <button id="chatbutton" class="btn" type="submit">Chat</button>
+						</div>
+					</form>
+					<div id="chat">Chat lädt...
 					</div>
-				</form>
-				  <div id="chat">chat hier</div>
-				</div>
-			</div>
+			</div> <!-- /content-right -->
 			{% endif %}
+		</div> <!-- /row fluid -->
+	</div> <!-- /fluid container -->
 
-		</div>
-	</div>
 
+	{% if page != "login" %}
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -92,48 +72,97 @@
     
     <script type="text/javascript">
 		
-	
-	<!-- nav -->
-	$('#speakerswitch').click(function(){
-		$('.speakerswitch').toggle();
-	});
-	$('#playpause').click(function(){
-		$('.playpause').toggle();
-	});
-	$('#stations').click(function(){
-		window.location = "/radiostations";
-	});
-	$('#nowplaying').click(function(){
-		window.location = "/nowplaying";
-	});
-	$('#playqueue').click(function(){
-		window.location = "/playqueue";
-	});
+	var html = "";
+	var last_artist = "";
+	var last_album = "";
+	var cur_artist;
+	var cur_album;
+	var songupdater = false;
 	
 	
-	<!--MPD Commands 
-	{% block controls %}
-	/*$('#stop').click(function() {
-		$.get('/mpdcommands?mpdcommand=stop&port='+ {{stream_port}} );
-	});
-	$('#playpause').click(function() {
-		$.get('/mpdcommands?mpdcommand=play&port='+ {{stream_port}} );
-	});
-	$('#next').click(function() {
-		$.get('/mpdcommands?mpdcommand=next&port='+ {{stream_port}} );
-	});
-	$('#previous').click(function() {
-		$.get('/mpdcommands?mpdcommand=previous&port='+ {{stream_port}} );
-	});*/
-	{% endblock %}
-	-->
-	
-	
+	<!-- Start -->
 	$(document).ready(function () {
-			update_chat();
-			setInterval(update_chat,5000);
-		});
+		render_stationoverview ();
+		}
+	);
+	<!-- Update the Chat -->
+	$(document).ready(function () {
+		update_chat();
+		setInterval(update_chat,5000);
+		}
+	);
+
 	
+	function render_stationoverview () {
+		$('#content').html("loading...");
+		$.get('/stationoverview')
+		.done(function(data) {
+			if (songupdater) {
+				clearInterval(songupdater);
+				}
+			$('#content').html(data);
+			navhtml = '';
+			$('#nav').html(navhtml);
+			
+			}
+		);
+	}
+	
+	function render_stationdetails (station_port) {
+			last_artist = "";
+			last_album = "";
+			$('#content').html("loading...");
+			$.get('/stationdetails',{'station_port':station_port})
+			.done(function(data) {
+				$('#content').html(data);
+				navhtml = '<li onclick="render_stationoverview()" style="cursor:pointer;"><a>Overview</a></li>'+
+							'<li class="divider-vertical"></li>'+
+							'<li onclick="previous()" style="cursor:pointer;"><a><i class="icon-fast-backward icon-white"></i></a></li>'+
+							'<li onclick="play()" style="cursor:pointer;"><a><i class="icon-play icon-white"></i></a></li>'+
+							'<li onclick="pause()" style="cursor:pointer;"><a><i class="icon-pause icon-white"></i></a></li>'+
+							'<li onclick="stop()" style="cursor:pointer;"><a><i class="icon-stop icon-white"></i></a></li>'+
+							'<li onclick="next()" style="cursor:pointer;"><a><i class="icon-fast-forward icon-white"></i></a></li>';
+				$('#nav').html(navhtml);
+				<!-- Update the Current Song -->
+				update_nowplaying(station_port);
+				songupdater = setInterval(function() {
+					update_nowplaying(station_port)},2000);
+				
+				}
+			);
+		}
+
+	
+	function update_nowplaying(station_port) {
+		$.getJSON('/nowplaying/',
+		{'station_port' : station_port})
+		.done(function(data) { 
+			cur_artist = data.artist;
+			cur_album = data.album;
+			html = "<b>" + data.title + "</b><br><br>" +
+				"<b>" + data.artist + "</b><br>" +
+				data.album + " (" + data.date + ")<br><br>" +
+				"<small>" +
+				"Genre: " + data.genre + "<br>" +
+				"Track: "+ data.track + "<br>" +
+				"Length: " + data.time + "<br>" +
+				"</small>";
+			$("#trackinfo").html(html);
+			
+			$('#trackinfo').show();
+			
+			if (cur_album != last_album) { //if album changes
+				$('#albumcovercontainer').html('<img src="{{STATIC_URL}}img/loading.gif" />');
+				update_albumcover(cur_artist,cur_album);
+			}
+			if (last_artist != cur_artist) { //if album changes
+				$('#artistinfo').html('<img src="{{STATIC_URL}}img/loading.gif" />');
+				update_artistinfo(cur_artist);
+			}
+			last_artist = cur_artist;
+			last_album = cur_album
+		});
+	}
 	
 
 	function update_chat() {
@@ -149,7 +178,6 @@
 			}
 			$('#chat').html(html);
 		});
-			
 	}
 	
 
@@ -203,7 +231,8 @@
     }
 	});
 </script>
-    
+   
+  {% endif %}
 
   </body>
 </html>

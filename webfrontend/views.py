@@ -97,10 +97,54 @@ def logincontrol(request):
 		cur_user, error = authenticate(username, password)
 		if cur_user and cur_user.is_active:
 			login(request, cur_user)
-			return HttpResponseRedirect('/radiostations')
-	return render_to_response('login.html',{'error':error,'login':True},context_instance=RequestContext(request))
+			return HttpResponseRedirect('/main')
+	return render_to_response('login.html',
+			{'error':error,
+			'page':"login"},
+			context_instance=RequestContext(request))
 	
 	
+def main(request):
+	#if current user is logged in
+	for e in STATIONS:
+
+		genres = {}
+		try:
+			cur_song = get_current_song(str(e['admin_port']))
+			genre = cur_song['genre']
+		except:
+			try:
+				cur_song = get_current_song(str(e['admin_port']))
+				genre = cur_song['genre']
+			except:
+				genre = "nix"
+		e['genre'] = genre
+	return render_to_response('master.html',
+			{'stations':STATIONS,
+			'page':"overview"},
+			context_instance=RequestContext(request))
+	
+	
+def stationoverview(request):	
+	for e in STATIONS:
+
+		genres = {}
+		try:
+			cur_song = get_current_song(str(e['admin_port']))
+			genre = cur_song['genre']
+		except:
+			try:
+				cur_song = get_current_song(str(e['admin_port']))
+				genre = cur_song['genre']
+			except:
+				genre = "nix"
+		e['genre'] = genre
+	return render_to_response('stationoverview.html',
+			{'stations':STATIONS,
+			'station_name':False,
+			'station_port':False },
+			context_instance=RequestContext(request))
+
 def radiostations(request):
 	for e in STATIONS:
 
@@ -117,32 +161,40 @@ def radiostations(request):
 		e['genre'] = genre
 	return render_to_response('stations.html',
 			{'stations':STATIONS,
-			'station_name':False},
+			'station_name':False,
+			'station_port':False},
 			context_instance=RequestContext(request))
 
 
-def nowplaying(request):
+def stationdetails(request):
 	station_port = request.GET['station_port']
 	
 	current_song = get_current_song(station_port.encode('utf-8'))
 	
-	if request.is_ajax():
-		return HttpResponse(json.dumps(current_song),mimetype="application/json")
-	else:
-		for e in STATIONS:
-			if e['admin_port'] == int(station_port):
-				station_name = e['stream_name']
+	for e in STATIONS:
+		if e['admin_port'] == int(station_port):
+			station_name = e['stream_name']
 				
-		cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
+	cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
+	return render_to_response('stationdetails.html',
+			{'lastfm_key':LASTFM_API_KEY,
+			'lastfm_url':LASTFM_API_URL,
+			'cur_song':current_song,
+			'station_port':station_port,
+			'station_name':station_name,
+			'page':"stationdetails",
+			'playlist':cur_playlist},context_instance=RequestContext(request))
 
-		return render_to_response('nowplaying.html',
-				{'lastfm_key':LASTFM_API_KEY,
-				'lastfm_url':LASTFM_API_URL,
-				'cur_song':current_song,
-				'station_port':station_port,
-				'station_name':station_name,
-				'playlist':cur_playlist},
-				context_instance=RequestContext(request))
+def nowplaying(request):
+	try:
+		station_port = request.GET['station_port']
+		current_song = get_current_song(station_port.encode('utf-8'))
+		return HttpResponse(json.dumps(current_song),mimetype="application/json")
+	except:
+		current_song = False
+		return HttpResponse(json.dumps(current_song),mimetype="application/json")
+		
+	
 
 
 def playqueue(request):

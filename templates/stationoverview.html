@@ -1,11 +1,3 @@
-{% extends "master.html" %}
-{%block content%}
- <div class="container-fluid">
-		<div class="row-fluid">
-			
-			<div class="content content-left span9">
-				
-				<div id="main">
 
 				<table class="table table-condensed table-striped table-hover">
 					<thead>
@@ -19,7 +11,7 @@
 					</thead>
 					<tbody>
 					{% for e in stations %}
-					<tr style="cursor:pointer" onclick="render_stationdetails( {{ e.admin_port }} )"><span >
+					<tr style="cursor:pointer" onclick="render_stationdetails( {{ e.admin_port }} )"><span>
 						
 							<td>	
 							
@@ -49,12 +41,9 @@
 			</table>
 			</div> <!-- /main -->
 		</div> <!-- /content -->
-		
-		
 
 
-	<script type="text/javascript">
-		
-		
-	</script>
-{% endblock %}
+    <script type="text/javascript">
+
+
+</script>

@@ -16,6 +16,12 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
     url(r'^radiostations/', 'webfrontend.views.radiostations'),
+    url(r'^$', 'webfrontend.views.logincontrol',name='index'),
+    url(r'^main/', 'webfrontend.views.main',name='index'),
+    url(r'^stationdetails/', 'webfrontend.views.stationdetails',name='index'),
+    url(r'^stationoverview/', 'webfrontend.views.stationoverview',name='index'),
+	url(r'^navbar/', 'webfrontend.views.navbar',name='index'),
+    
     url(r'^playqueue/', 'webfrontend.views.playqueue'),
     url(r'^nowplaying/', 'webfrontend.views.nowplaying'),
     #url(r'^lastfmalbuminfo/', 'webfrontend.views.get_lastfm_albuminfo'),
