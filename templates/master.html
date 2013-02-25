@@ -45,7 +45,9 @@
 			</div> <!-- /content-left -->
 			{% if page != "login" %}
 			<div class="span3 content-right">
-					<h3>...Player...</h3>
+					<div class="content">
+						<audio id="audiotag1" src="http://leukosia.eu:8003" controls></audio>
+					</div>
 					<br>
 					<hr>
 					<form action="" method="post" onsubmit="push_chat();return false;">
@@ -78,6 +80,7 @@
 	var cur_artist;
 	var cur_album;
 	var songupdater = false;
+	var a = document.getElementsByTagName("audio")[0];
 	
 	
 	<!-- Start -->
