@@ -94,7 +94,6 @@
 		setInterval(update_chat,5000);
 		}
 	);
-
 	
 	function render_stationoverview () {
 		$('#content').html("loading...");
@@ -114,10 +113,10 @@
 	function render_stationdetails (station_port) {
 			last_artist = "";
 			last_album = "";
-			$('#content').html("loading...");
+			$('#stationdetails').html("loading...");
 			$.get('/stationdetails',{'station_port':station_port})
 			.done(function(data) {
-				$('#content').html(data);
+				$('#stationdetails').html(data);
 				navhtml = '<li onclick="render_stationoverview()" style="cursor:pointer;"><a>Overview</a></li>'+
 							'<li class="divider-vertical"></li>'+
 							'<li onclick="previous()" style="cursor:pointer;"><a><i class="icon-fast-backward icon-white"></i></a></li>'+

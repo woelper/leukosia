@@ -5,8 +5,8 @@
 					  <li><a href="#tab2" data-toggle="tab">Artistinfo</a></li>
 					  <li><a href="#tab3" data-toggle="tab">Play Queue</a></li>
 					  <li><a href="#tab4" data-toggle="tab">Playlists</a></li>
-					  <li><a href="#tab5" data-toggle="tab">Now Playing</a></li>
-					  <li><a href="#tab6" data-toggle="tab">Now Playing</a></li>
+					  <li><a href="#tab5" data-toggle="tab">Library</a></li>
+					  <li><a href="#tab6" data-toggle="tab">...</a></li>
 					</ul>
 					
 					<div class="tab-content">
@@ -22,6 +22,7 @@
 						
 						<div class="tab-pane" id="tab2">
 							<div id="artistinfo">
+								<!-- artistinfo created by ajax call -->
 							</div>
 						</div>
 						
@@ -39,7 +40,7 @@
 								</tr>		
 								</thead>
 								<tbody>
-								{% for e in playlist%}
+								{% for e in queue%}
 								<tr>
 									<td>{{e.track}}</td>
 									<td>{{e.title}}</td>
@@ -55,7 +56,61 @@
 							
 						</div>
 						<div class="tab-pane" id="tab4">
-							<div id="artistinfo">
+							<div id="playlists">
+								<div class="accordion" id="accordion2">
+									{% for e in playlists_withsongs %}
+									  <div class="accordion-group">
+										<div class="accordion-heading">
+										  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#{{ e.name }}">
+											{{ e.name }}
+										  </a>
+
+										</div>
+										<div id="{{ e.name }}" class="accordion-body collapse">
+										  <div class="accordion-inner">
+											    <div class="btn-group">
+											<button class="btn">dies</button>
+											<button class="btn">das</button>
+											<button class="btn">und</button>
+											<button class="btn">so</button>
+											</div>
+										</div>
+										<div class="accordion-inner">
+											
+											<table class="table table-condensed table-striped">
+												<thead>
+													<tr>			
+													<th>Track</th>
+													<th>Title</th>
+													<th>Artist</th>
+													<th>Album</th>
+													<th>Date</th>
+													<th>Genre</th>
+													<th>Duration</th>		
+												</tr>		
+												</thead>
+												<tbody>
+													{% for s in e.songs %}
+													<tr>
+														<td>{{s.track}}</td>
+														<td>{{s.title|default:"no id3"}}</td>
+														<td>{{s.artist}}</td>
+														<td>{{s.album}}</td>
+														<td>{{s.date}}</td>
+														<td>{{s.genre}}</td>
+														<td>{{s.time}}</td>
+													</tr>
+													{% endfor %}
+													</tbody>
+											</table>
+											
+											
+										  </div>
+										</div>
+									  </div>
+
+									{% endfor %}
+								</div>
 							</div>
 						</div>
 						<div class="tab-pane" id="tab5">

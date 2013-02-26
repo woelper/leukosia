@@ -73,8 +73,9 @@ def get_current_song(port):
 	client.close()
 	client.disconnect() 
 	return cur_song
-	
-def get_current_playlist(port):
+
+
+def get_queue(port):
 	client = MPDClient()
 	client.connect(HOST,port)
 	client.password(PASSW)
@@ -84,6 +85,25 @@ def get_current_playlist(port):
 	client.close()
 	client.disconnect() 
 	return cur_playlist
+	
+	
+def get_playlists(port):
+	client = MPDClient()
+	client.connect(HOST,port)
+	client.password(PASSW)
+	playlists = client.listplaylists()
+	client.close()
+	client.disconnect() 
+	return playlists
+
+def get_songs_from_playlist(port,playlist):
+	client = MPDClient()
+	client.connect(HOST,port)
+	client.password(PASSW)
+	songs = client.listplaylistinfo(playlist)
+	client.close()
+	client.disconnect() 
+	return songs
 
 
 ### Controls
@@ -145,37 +165,24 @@ def stationoverview(request):
 			'station_port':False },
 			context_instance=RequestContext(request))
 
-def radiostations(request):
-	for e in STATIONS:
 
-		genres = {}
-		try:
-			cur_song = get_current_song(str(e['admin_port']))
-			genre = cur_song['genre']
-		except:
-			try:
-				cur_song = get_current_song(str(e['admin_port']))
-				genre = cur_song['genre']
-			except:
-				genre = "nix"
-		e['genre'] = genre
-	return render_to_response('stations.html',
-			{'stations':STATIONS,
-			'station_name':False,
-			'station_port':False},
-			context_instance=RequestContext(request))
 
 
 def stationdetails(request):
-	station_port = request.GET['station_port']
+	station_port = request.GET['station_port'].encode('utf-8')
 	
-	current_song = get_current_song(station_port.encode('utf-8'))
+	current_song = get_current_song(station_port)
 	
 	for e in STATIONS:
 		if e['admin_port'] == int(station_port):
 			station_name = e['stream_name']
 				
-	cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
+	queue = get_queue(station_port)
+	playlists = get_playlists(station_port)
+	playlists_withsongs = []
+	for playlist in playlists:
+		playlists_withsongs.append( { 'name' : playlist['playlist'], 'songs' : get_songs_from_playlist( station_port,playlist [ 'playlist' ] ) } ) 
+		
 	return render_to_response('stationdetails.html',
 			{'lastfm_key':LASTFM_API_KEY,
 			'lastfm_url':LASTFM_API_URL,
@@ -183,7 +190,10 @@ def stationdetails(request):
 			'station_port':station_port,
 			'station_name':station_name,
 			'page':"stationdetails",
-			'playlist':cur_playlist},context_instance=RequestContext(request))
+			'queue':queue,
+			'playlists':playlists,
+			'playlists_withsongs':playlists_withsongs},
+			context_instance=RequestContext(request))
 
 def nowplaying(request):
 	try:
@@ -204,7 +214,7 @@ def playqueue(request):
 
 ### Ajax
 
-def mpdcommands(request):
+def mpdcommands(request, playlist=""):
 	port = request.GET['port'].encode('utf-8')
 	mpdcommand = request.GET['mpdcommand'].encode('utf-8')
 	client = MPDClient()
@@ -212,6 +222,8 @@ def mpdcommands(request):
 	client.password(PASSW)
 	if mpdcommand == "get_current_song":
 		client.get_current_song()
+	elif mpdcommand == "get_playlists":
+		client.listplaylists()
 	elif mpdcommand == "play":
 		client.play()
 	elif mpdcommand == "next":
