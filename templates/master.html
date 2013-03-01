@@ -90,19 +90,19 @@
 									</li>
 							</ul>
 							<div id="stationlist" class="collapse in">
+								
 									{% for station in stationlist %}
-									
 									<ul class="inline" id="stationoverview_{{ station.admin_port }}">
-									
 									</ul>
+									
 									<div id="stationdetails_{{ station.admin_port }}" class="collapse stationdetails">
 									loading station...
-							</div>
-									
+									</div>
+									<hr>		
 									{% endfor %}
+							
 							</div>
 							
-
 							
 					</div> <!-- * end content-left * -->
 					
@@ -153,10 +153,9 @@
 	var songupdater = false;
 	var main_interval = false;
 	var a = document.getElementsByTagName("audio")[0];
-	var last_fm_key = '{{ lastfm_key }}';
+	var lastfm_key = '{{ lastfm_key }}';
 	var lastfm_url = '{{ lastfm_url }}';
 	var stationlist = {{ stationlist|jsonify }};
-	
 	
 
 	
@@ -172,12 +171,12 @@
 			//render_stationoverview();
 			render_chat();
 			
-			main_interval = setInterval(function() { 		// sets Interval for automatic page updates
-				for (var i = 0; i < stationlist.length; i++) {
-						render_stationoverview(i);
-				}
-				render_chat();
-			}, 5000);
+			//main_interval = setInterval(function() { 		// sets Interval for automatic page updates
+			//	for (var i = 0; i < stationlist.length; i++) {
+			//			render_stationoverview(i);
+			//	}
+			//	render_chat();
+			//}, 5000);
 	});
 	
 	
@@ -227,53 +226,22 @@
 	}
 	
 	
-	
-	function render_stationdetails (station_port) {
+	function render_stationdetails(station_port,artist,album) {
 	/* 
 	 *  gets the html for the desired station and renders it
 	 */
 		last_artist = "";
 		last_album = "";
-		$('#stationdetails').html("loading...");
 		$.get('/render-station-details/',{'station-port': station_port}).done(function(html){
-			$('#stationdetails').html(html);
+			$('#stationdetails_' + station_port).html(html);
+			$('#stationdetails_'+station_port).on('shown', function () {
+				update_albumcover(station_port,artist,album);
+			});
 		});
 	}
-	
 	
 	
 
-	function update_albumcover(artist,album) {
-		
-		$.getJSON(lastfm_url, {
-          "api_key": lastfm_key,
-          "format":   "json",
-          "artist":artist,
-          "album":album,
-          "method":"album.getInfo"
-        })
-        .done(function(data) {
-			$('#nowplaying').find("img").attr(data['album']['image'][3]['#text']);
-		});
-	}
-	
-	function update_artistinfo(artist) {
-		
-		$.getJSON("{{lastfm_url}}",{
-          "api_key":  "{{lastfm_key}}",
-          "format":   "json",
-          "artist": artist,
-          "method": "artist.getInfo"
-        })
-        .done(function(data) {
-			$('#artistinfo').find("img").attr(data['artist']['image'][3]['#text']);
-			$('#artistinfo').find("strong").attr(data['artist']['name']);
-			$('#artistinfo').find("em").attr(data['artist']['bio']['formationlist']['formation']['yearfrom']);
-			$('#artistinfo').find("div").attr(data['artist']['bio']['summary']);
-		});
-	}
-	
-	
 	
 	
 	function render_stationdetails_old (station_port) {

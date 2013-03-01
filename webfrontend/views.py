@@ -3,6 +3,7 @@ import datetime
 import logging
 import urllib, urllib2
 
+
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse
@@ -19,11 +20,10 @@ except ImportError:
 
     
 from mpd import MPDClient, MPDError, CommandError
-
+import pylast
 from webfrontend.models import *
 
 logger = logging.getLogger(__name__)
-
 
 
 
@@ -51,7 +51,7 @@ class MPDPoller(object):
             # Catch socket errors
         except IOError as (errno, strerror):
             raise PollerError("IOError: Could not connect to '%s:%s' - %s" %
-                              (self._host, self._port, e))
+                              (self._host, self._port, strerror))
         # Catch all other possible errors
         # ConnectionError and ProtocolError are always fatal.  Others may not
         # be, but we don't know how to handle them here, so treat them as if
@@ -149,6 +149,10 @@ PASSW = Settings.objects.all()[0].mpd_pass.encode('utf_8')
 LASTFM_API_URL = Settings.objects.all()[0].lastfm_url.encode('utf_8')
 LASTFM_API_KEY = Settings.objects.all()[0].lastfm_key.encode('utf_8')
 
+lastfm = pylast.LastFMNetwork(api_key = LASTFM_API_KEY, api_secret = 
+							"", username = "", password_hash = "")
+
+
 
 ### Helper Functions ###   
     
@@ -165,46 +169,6 @@ def authenticate(username=None, password=None):
         msg = "The username and/or password were incorrect."
     return user, msg
     
-# mpd
-def get_song(port):
-    client = MPDClient()
-    client.connect(HOST,port)
-    client.password(PASSW)
-    cur_song = client.currentsong()
-    cur_song['time'] = str(datetime.timedelta(seconds=int(cur_song['time'])))
-    client.close()
-    client.disconnect() 
-    return cur_song
-
-def get_queue(port):
-    client = MPDClient()
-    client.connect(HOST,port)
-    client.password(PASSW)
-    cur_playlist = client.playlistinfo()
-    for e in cur_playlist:
-        e['time'] = str(datetime.timedelta(seconds=int(e['time'])))
-        client.close()
-        client.disconnect()
-    return cur_playlist
-
-
-def get_playlists(port):
-    client = MPDClient()
-    client.connect(HOST,port)
-    client.password(PASSW)
-    playlists = client.listplaylists()
-    client.close()
-    client.disconnect() 
-    return playlists
-
-def get_songs_from_playlist(port,playlist):
-    client = MPDClient()
-    client.connect(HOST,port)
-    client.password(PASSW)
-    songs = client.listplaylistinfo(playlist)
-    client.close()
-    client.disconnect() 
-    return songs
 
 def get_stationlist():
 	station_objects = Stations.objects.all()
@@ -263,6 +227,7 @@ def render_station_overview(request):
 	and renders it
 
 	"""
+	current_song = False
 	stationlist = get_stationlist()
 	admin_port = request.GET['port'].encode('utf-8')
 	for station in stationlist:
@@ -271,15 +236,13 @@ def render_station_overview(request):
 			stream_port = str(station['stream_port'])
 			stream_name = station['stream_name']
 			print ('test')
-    #artist, title , genre = '', '', ''
 	try:
 		poller = MPDPoller(admin_port)
 		poller.connect()
 		current_song = poller.get_current_song()
 		poller.disconnect()
-		#current_song = {'artist':'Metallica','album':'...and justice for all','title':'blackend','genre':'Metal'} #fuck this
 	except:
-		print "Exception" 
+		print "Exception"
 	return render_to_response('stations_stationoverview.html',
                                   {'current_song': current_song, 
                                   'mpdhost': HOST, 'admin_port':admin_port, 
@@ -288,22 +251,28 @@ def render_station_overview(request):
    
     
 def render_station_details(request):
-    """
-    
-    gets html for details of stations
-    and renders it
-    
-    """
-    station_port = request.GET['station-port'].encode('utf-8')
-    print("getting songinfo for port: " + station_port)
-    poller = MPDPoller(station_port)
-    poller.connect()
-    current_song = poller.get_current_song()
-    poller.disconnect()
-    print str(current_song)
-    return render_to_response('stations_stationdetails.html',
-                              {'current_song': current_song},
-                              context_instance=RequestContext(request))
+	"""
+
+	gets html for details of stations
+	and renders it
+
+	"""
+	station_port = request.GET['station-port'].encode('utf-8')
+	print("getting songinfo for port: " + station_port)
+	poller = MPDPoller(station_port)
+	poller.connect()
+	current_song = poller.get_current_song()
+	poller.disconnect()  
+	current_song['time'] = str(datetime.timedelta(seconds=int(current_song['time'])))[2:]
+	print str(current_song)
+	#artist = lastfm.get_artist("System of a Down")
+	#print artist
+	#print artist.get_cover_image(4)
+	
+	return render_to_response('stations_stationdetails.html',
+							{'current_song': current_song,
+							'station_port':station_port},
+							context_instance=RequestContext(request))
     
 
 def render_chat(request):
@@ -354,6 +323,7 @@ def stationdetails(request): # obsolet
     playlists_withsongs = []
     for playlist in playlists:
         playlists_withsongs.append( { 'name' : playlist['playlist'], 'songs' : get_songs_from_playlist( station_port,playlist [ 'playlist' ] ) } ) 
+
     return render_to_response('stationdetails.html',
                               {'lastfm_key':LASTFM_API_KEY,
                                'lastfm_url':LASTFM_API_URL,

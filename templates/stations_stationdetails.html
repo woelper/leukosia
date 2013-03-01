@@ -1,36 +1,50 @@
 <!-- Content of stations_stationdetails.html
     ================================================== -->
     
-<div class="tabbable">
+<div class="tabbable tabs-left" id="stationdetails_{{ station_port }}">
 
 		<ul class="nav nav-tabs">
-			  <li class="active"><a href="#nowplaying" data-toggle="tab">Now Playing</a></li>
-			  <li><a href="#artistinfo" data-toggle="tab">Artistinfo</a></li>
-			  <li><a href="#tab3" data-toggle="tab">Play Queue</a></li>
-			  <li><a href="#tab4" data-toggle="tab">Playlists</a></li>
-			  <li><a href="#tab5" data-toggle="tab">Library</a></li>
-			  <li><a href="#tab6" data-toggle="tab">...</a></li>
+			  <li class="active"><a href="#nowplaying_{{ station_port }}" data-toggle="tab">Now Playing</a></li>
+			  <li><a href="#artistinfo_{{ station_port }}" data-toggle="tab">Artistinfo</a></li>
+			  <li><a href="#playqueue_{{ station_port }}" data-toggle="tab">Play Queue</a></li>
+			  <li><a href="#playlists_{{ station_port }}" data-toggle="tab">Playlists</a></li>
+			  <li><a href="#library_{{ station_port }}" data-toggle="tab">Library</a></li>
+			  <li><a href="#tab6_{{ station_port }}" data-toggle="tab">...</a></li>
 		</ul>
 	
 		<div class="tab-content">
 		
-				<div class="tab-pane active" id="nowplaying"> <!-- ** tab nowplaying ** -->
-					
-						<div class="pull-left imgcontainer">
-								<img class="img-polaroid lastfm" src="http://cdn.last.fm/flatness/responsive/2/noimage/default_album_300_g4.png" />
-						</div>
-						<div id="trackinfo" style="display:none" class="pull-left">
+				<div class="tab-pane active" id="nowplaying_{{ station_port }}"> <!-- ** tab nowplaying ** -->
+
+										<img class="img-polaroid pull-left span3" src="http://cdn.last.fm/flatness/responsive/2/noimage/default_artist_140_g2.png" />
+
+										<div id="trackinfo" class="span9">
+												<strong>{{ current_song.title }}</strong>
+												<br>
+												{{ current_song.artist }}
+												<br>
+												<br>
+												{{ current_song.album }} {% if current_song.date %} ({{ current_song.date }}){% endif %}
+												<br>
+												<br>
+												<small>
+														Track# {{ current_song.track }}
+														<br>
+														{{ current_song.time }}
+														
+												</small>
+										</div>
 								
-						</div>
+						
 				</div> <!-- ** end tab nowplaying ** -->
 				
-				<div class="tab-pane" id="artistinfo"> <!-- ** end tab artistinfo ** -->
+				<div class="tab-pane" id="artistinfo_{{ station_port }}"> <!-- ** end tab artistinfo ** -->
 						
-						<div class="pull-left imgcontainer">
+						<div class="pull-left span2">
 								<img class="img-polaroid pull-left" src="http://cdn.last.fm/flatness/responsive/2/noimage/default_artist_140_g2.png" />
 						</div>
 						<p>
-								<strong></strong>
+								<strong>{{ current_song.artist }}</strong>
 								<br>
 								<em></em>
 								<br>
@@ -40,7 +54,7 @@
 						
 				</div> <!-- ** end tab artistinfo ** -->
 				
-				<div class="tab-pane" id="tab3"> <!-- ** tab playqueue ** -->
+				<div class="tab-pane" id="playqueue_{{ station_port }}"> <!-- ** tab playqueue ** -->
 						<table class="table table-condensed table-striped">
 								<thead>
 										<tr>			
@@ -69,10 +83,10 @@
 						</table>
 				</div> <!-- ** end tab playqueue ** -->
 				
-				<div class="tab-pane" id="tab4"> <!-- ** tab playlist ** -->
+				<div class="tab-pane" id="playlists_{{ station_port }}"> <!-- ** tab playlists ** -->
 				</div> <!-- ** end tab playlist ** -->
 				
-				<div class="tab-pane" id="tab5">
+				<div class="tab-pane" id="library_{{ station_port }}">
 						<div id="artistinfo">
 						</div>
 				</div>
@@ -88,5 +102,37 @@
 			
 
 <script type="text/javascript">
+
+		
+	function update_albumcover(station_port,artist,album) {
+		
+		$.getJSON(lastfm_url, {
+          "api_key": lastfm_key,
+          "format":   "json",
+          "artist":artist,
+          "album":album,
+          "method":"album.getInfo"
+        })
+        .done(function(data) {
+			$('#nowplaying_' + station_port).find("img")
+				.attr('src',data['album']['image'][3]['#text']);
+		});
+	}
+	
+		function update_artistinfo(artist) {
+		
+		$.getJSON("{{lastfm_url}}", {
+          "api_key":  "{{lastfm_key}}",
+          "format":   "json",
+          "artist": artist,
+          "method": "artist.getInfo"
+        })
+        .done(function(data) {
+			$('#artistinfo').find("img").attr(data['artist']['image'][3]['#text']);
+			$('#artistinfo').find("strong").attr(data['artist']['name']);
+			$('#artistinfo').find("em").attr(data['artist']['bio']['formationlist']['formation']['yearfrom']);
+			$('#artistinfo').find("div").attr(data['artist']['bio']['summary']);
+		});
+	}
     
 </script>

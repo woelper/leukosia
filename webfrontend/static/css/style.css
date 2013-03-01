@@ -9,12 +9,9 @@ body {
 }
 
 .imgcontainer{
-	width:250px;
-	margin-right:25px;
 }
 img.lastfm {
-	height:250px;
-	width:250px;
+	width:auto;
 }
 .chat {
 	position:fixed;
