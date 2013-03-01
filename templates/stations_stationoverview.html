@@ -1,0 +1,56 @@
+<!-- Content of stations_stationslist.html
+    ================================================== -->
+
+				
+				<li>			
+						<button type="button" class="btn btn-primary btn-mini" data-toggle="collapse" data-target="#stationdetails_{{ admin_port }}" onclick="render_stationdetails('{{ admin_port }}; return false;')">
+								<i class="icon-chevron-down icon-white"></i>
+						</button>
+				</li>
+				
+				<li>
+						<abbr title="{{ station.description }}"><h4>{{ stream_name }} </h4></abbr>
+				</li>
+				
+				
+				{% if current_song.artist %}
+				<li>
+						<i class="icon-music"></i>
+				</li>
+				
+				<li>
+						<p>{{ current_song.artist }} - {{ current_song.title }}
+				</li>
+				{% endif %}
+				
+				{% if current_song.genre %}
+				<li>
+						<span class="muted inline">
+								({{ current_song.genre }})
+						</span>
+				</li>
+				{% endif %}
+				
+				</li>
+				
+				{% if current_song.artist != "" %}
+				<li class="pull-right">
+						<p>
+								<button class="btn btn-mini" onclick="a.src='http://{{ mpdhost }}:{{ stream_port }}'; a.play(); ">
+										<i class="icon-headphones"></i>
+								</button>
+						</p>
+				</li>
+				{% endif %}
+
+				<hr>
+
+
+	<!-- Le javascript from stations_stationlist.html
+    ================================================== -->
+  
+
+    <script type="text/javascript">
+    
+    
+	</script>

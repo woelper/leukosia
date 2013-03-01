@@ -10,249 +10,410 @@ from django.http import HttpResponseRedirect
 from django.core.context_processors import csrf
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 try:
     import simplejson as json
 except ImportError:
     import json
+
+
     
-from webfrontend.models import *
 from mpd import MPDClient, MPDError, CommandError
+
+from webfrontend.models import *
 
 logger = logging.getLogger(__name__)
 
 
-### Settings
 
-#mpd settings
+
+### Define MPD Object ###
+class PollerError(Exception):
+    """Fatal error in poller."""
+
+class MPDPoller(object):
+    """
+    
+    Define MPD Objects
+    (http://jatreuman.indefero.net/p/python-mpd/page/ExampleErrorhandling/)
+    
+    """
+    def __init__(self, station_port):
+        self._host = HOST;
+        self._port = station_port;
+        self._password = PASSW;
+        self._client = MPDClient()
+        
+    def connect(self):
+        try:
+            print ("Connecting to " + self._host + ":" + self._port)
+            self._client.connect(self._host, self._port)
+            # Catch socket errors
+        except IOError as (errno, strerror):
+            raise PollerError("IOError: Could not connect to '%s:%s' - %s" %
+                              (self._host, self._port, e))
+        # Catch all other possible errors
+        # ConnectionError and ProtocolError are always fatal.  Others may not
+        # be, but we don't know how to handle them here, so treat them as if
+        # they are instead of ignoring them.
+        except MPDError as e:
+            raise PollerError("MPDError: Could not connect to '%s:%s' - %s" %
+                              (self._host, self._port, e))
+        if self._password:
+            try:
+                self._client.password(self._password)
+
+            # Catch errors with the password command (e.g., wrong password)
+            except CommandError as e:
+                raise PollerError("Could not connect to '%s:%s' - "
+                                  "password commmand failed: %s" %
+                                  (self._host, self._port, e))
+
+            # Catch all other possible errors
+            except (MPDError, IOError) as e:
+                raise PollerError("Could not connect to '%s': "
+                                  "error with password command: %s" %
+                                  (self._host, e))
+                
+    def get_current_song(self):
+        try:
+            song = self._client.currentsong()
+        # Couldn't get the current song, so try reconnecting and retrying
+        except (MPDError, IOError):
+            # No error handling required here
+            # Our disconnect function catches all exceptions, and therefore
+            # should never raise any.
+            self.disconnect()
+            try:
+                self.connect()
+            # Reconnecting failed
+            except PollerError as e:
+                raise PollerError("Reconnecting failed: %s" % e)
+            try:
+                song = self._client.currentsong()
+            # Failed again, just give up
+            except (MPDError, IOError) as e:
+                raise PollerError("Couldn't retrieve current song: %s" % e)
+        # Hurray!  We got the current song without any errors!
+        return song
+    
+    def get_queue(self):
+        try:
+            queue = self._client.playlistinfo()
+        # Couldn't get the current song, so try reconnecting and retrying
+        except (MPDError, IOError):
+            # No error handling required here
+            # Our disconnect function catches all exceptions, and therefore
+            # should never raise any.
+            self.disconnect()
+            try:
+                self.connect()
+            # Reconnecting failed
+            except PollerError as e:
+                raise PollerError("Reconnecting failed: %s" % e)
+            try:
+                queue = self._client.playlistinfo()
+            # Failed again, just give up
+            except (MPDError, IOError) as e:
+                raise PollerError("Couldn't retrieve playlist: %s" % e)
+        # Hurray!  We got the current song without any errors!
+        for song in queue:
+            song['time'] = str(datetime.timedelta(seconds=int(e['time'])))
+        return queue
+
+    def disconnect(self):
+        # Try to tell MPD we're closing the connection first
+        try:
+            self._client.close()
+
+        # If that fails, don't worry, just ignore it and disconnect
+        except (MPDError, IOError):
+            pass
+        try:
+            self._client.disconnect()
+        # Disconnecting failed, so use a new client object instead
+        # This should never happen.  If it does, something is seriously broken,
+        # and the client object shouldn't be trusted to be re-used.
+        except (MPDError, IOError):
+            self._client = MPDClient()
+        
+
+
+### Globals ###
+
+# MPD globals
 HOST = Settings.objects.all()[0].mpd_server.encode('utf_8')
 PASSW = Settings.objects.all()[0].mpd_pass.encode('utf_8')
 
-
-#port settings
-STATIONS = []
-for e in Stations.objects.all():
-	
-	dict = model_to_dict(e)
-	
-	STATIONS.append(dict)
-	
-
-#last.fm settings
+# Last-fm globals
 LASTFM_API_URL = Settings.objects.all()[0].lastfm_url.encode('utf_8')
 LASTFM_API_KEY = Settings.objects.all()[0].lastfm_key.encode('utf_8')
 
 
-
-
-
-### Helper Functions 
-
-#login
+### Helper Functions ###   
+    
+# login
 def authenticate(username=None, password=None):
-	from django.contrib.auth import authenticate
-	user = authenticate(username=username, password=password)
-	if user is not None:
-		# the password verified for the user
-		if user.is_active:
-			msg = "User is valid, active and authenticated"
-		else:
-			msg = "The password is valid, but the account has been disabled!"
-	else:
-		# the authentication system was unable to verify the username and password
-		msg = "The username and password were incorrect."
-	return user, msg
-
-#mpd
-def get_current_song(port):
-	client = MPDClient()
-	client.connect(HOST,port)
-	client.password(PASSW)
-	cur_song = client.currentsong()
-	cur_song['time'] = str(datetime.timedelta(seconds=int(cur_song['time'])))
-	client.close()
-	client.disconnect() 
-	return cur_song
-
+    from django.contrib.auth import authenticate
+    user = authenticate(username=username, password=password)
+    if user is not None:    # the password verified for the user
+        if user.is_active:
+            msg = "User is valid, active and authenticated"
+        else:
+            msg = "The password is valid, but the account has been disabled!"
+    else:                    # unable to verify the username and password
+        msg = "The username and/or password were incorrect."
+    return user, msg
+    
+# mpd
+def get_song(port):
+    client = MPDClient()
+    client.connect(HOST,port)
+    client.password(PASSW)
+    cur_song = client.currentsong()
+    cur_song['time'] = str(datetime.timedelta(seconds=int(cur_song['time'])))
+    client.close()
+    client.disconnect() 
+    return cur_song
 
 def get_queue(port):
-	client = MPDClient()
-	client.connect(HOST,port)
-	client.password(PASSW)
-	cur_playlist = client.playlistinfo()
-	for e in cur_playlist:
-		e['time'] = str(datetime.timedelta(seconds=int(e['time'])))
-	client.close()
-	client.disconnect() 
-	return cur_playlist
-	
-	
+    client = MPDClient()
+    client.connect(HOST,port)
+    client.password(PASSW)
+    cur_playlist = client.playlistinfo()
+    for e in cur_playlist:
+        e['time'] = str(datetime.timedelta(seconds=int(e['time'])))
+        client.close()
+        client.disconnect()
+    return cur_playlist
+
+
 def get_playlists(port):
-	client = MPDClient()
-	client.connect(HOST,port)
-	client.password(PASSW)
-	playlists = client.listplaylists()
-	client.close()
-	client.disconnect() 
-	return playlists
+    client = MPDClient()
+    client.connect(HOST,port)
+    client.password(PASSW)
+    playlists = client.listplaylists()
+    client.close()
+    client.disconnect() 
+    return playlists
 
 def get_songs_from_playlist(port,playlist):
-	client = MPDClient()
-	client.connect(HOST,port)
-	client.password(PASSW)
-	songs = client.listplaylistinfo(playlist)
-	client.close()
-	client.disconnect() 
-	return songs
+    client = MPDClient()
+    client.connect(HOST,port)
+    client.password(PASSW)
+    songs = client.listplaylistinfo(playlist)
+    client.close()
+    client.disconnect() 
+    return songs
 
+def get_stationlist():
+	station_objects = Stations.objects.all()
+	stationlist = []
+	for station in station_objects:
+		station = model_to_dict(station)
+		stationlist.append(station)
+	return stationlist
 
 ### Controls
 
-def logincontrol(request):
-	error = ""
-	
-	if request.method == 'POST':
-		username = request.POST['username'].encode('utf-8')
-		password = request.POST['password'].encode('utf-8')
-		cur_user, error = authenticate(username, password)
-		if cur_user and cur_user.is_active:
-			login(request, cur_user)
-			return HttpResponseRedirect('/main')
-	return render_to_response('login.html',
-			{'error':error,
-			'page':"login"},
-			context_instance=RequestContext(request))
-	
-	
+def render_login(request):
+    """
+        
+        renders the login page
+    
+    """
+    error = ""
+    if request.method == 'POST':
+        username = request.POST['username'].encode('utf-8')
+        password = request.POST['password'].encode('utf-8')
+        cur_user, error = authenticate(username, password)
+        if cur_user and cur_user.is_active:
+            login(request, cur_user)
+            return HttpResponseRedirect('/main')
+    return render_to_response('login.html',
+                                  {'error': error,'page': "login"},
+                                  context_instance=RequestContext(request))
+
+
 def main(request):
-	#if current user is logged in
-	for e in STATIONS:
+	"""
 
-		genres = {}
-		try:
-			cur_song = get_current_song(str(e['admin_port']))
-			genre = cur_song['genre']
-		except:
-			try:
-				cur_song = get_current_song(str(e['admin_port']))
-				genre = cur_song['genre']
-			except:
-				genre = "nix"
-		e['genre'] = genre
+	gets html for main page on redirect after login
+	and renders it
+
+	"""
+	stationlist = get_stationlist()
+	# check if user is logged in, else fall back to login
+	if not request.user.is_authenticated():
+		error = "You are not signed in."
+		return render_to_response('login.html',
+								{'error': error,'page': "login"},
+								context_instance=RequestContext(request))
+	username = request.user.username
 	return render_to_response('master.html',
-			{'stations':STATIONS,
-			'page':"overview"},
-			context_instance=RequestContext(request))
-	
-	
-def stationoverview(request):	
-	for e in STATIONS:
-
-		genres = {}
-		try:
-			cur_song = get_current_song(str(e['admin_port']))
-			genre = cur_song['genre']
-		except:
-			try:
-				cur_song = get_current_song(str(e['admin_port']))
-				genre = cur_song['genre']
-			except:
-				genre = "nix"
-		e['genre'] = genre
-	return render_to_response('stationoverview.html',
-			{'stations':STATIONS,
-			'station_name':False,
-			'station_port':False },
-			context_instance=RequestContext(request))
+							{'lastfm_key': LASTFM_API_KEY, 'lastfm_url': LASTFM_API_URL,
+							'username': username, 'stationlist':stationlist},
+							context_instance=RequestContext(request))
 
 
+def render_station_overview(request):
+	"""
 
+	gets html for list of stations
+	and renders it
 
-def stationdetails(request):
-	station_port = request.GET['station_port'].encode('utf-8')
-	
-	current_song = get_current_song(station_port)
-	
-	for e in STATIONS:
-		if e['admin_port'] == int(station_port):
-			station_name = e['stream_name']
-				
-	queue = get_queue(station_port)
-	playlists = get_playlists(station_port)
-	playlists_withsongs = []
-	for playlist in playlists:
-		playlists_withsongs.append( { 'name' : playlist['playlist'], 'songs' : get_songs_from_playlist( station_port,playlist [ 'playlist' ] ) } ) 
-		
-	return render_to_response('stationdetails.html',
-			{'lastfm_key':LASTFM_API_KEY,
-			'lastfm_url':LASTFM_API_URL,
-			'cur_song':current_song,
-			'station_port':station_port,
-			'station_name':station_name,
-			'page':"stationdetails",
-			'queue':queue,
-			'playlists':playlists,
-			'playlists_withsongs':playlists_withsongs},
-			context_instance=RequestContext(request))
-
-def nowplaying(request):
+	"""
+	stationlist = get_stationlist()
+	admin_port = request.GET['port'].encode('utf-8')
+	for station in stationlist:
+		if admin_port == str(station['admin_port']):
+			admin_port = str(station['admin_port'])
+			stream_port = str(station['stream_port'])
+			stream_name = station['stream_name']
+			print ('test')
+    #artist, title , genre = '', '', ''
 	try:
-		station_port = request.GET['station_port']
-		current_song = get_current_song(station_port.encode('utf-8'))
-		return HttpResponse(json.dumps(current_song),mimetype="application/json")
+		poller = MPDPoller(admin_port)
+		poller.connect()
+		current_song = poller.get_current_song()
+		poller.disconnect()
+		#current_song = {'artist':'Metallica','album':'...and justice for all','title':'blackend','genre':'Metal'} #fuck this
 	except:
-		current_song = False
-		return HttpResponse(json.dumps(current_song),mimetype="application/json")
-		
-	
+		print "Exception" 
+	return render_to_response('stations_stationoverview.html',
+                                  {'current_song': current_song, 
+                                  'mpdhost': HOST, 'admin_port':admin_port, 
+                                  'stream_port':stream_port,'stream_name':stream_name},
+                                  context_instance=RequestContext(request))
+   
+    
+def render_station_details(request):
+    """
+    
+    gets html for details of stations
+    and renders it
+    
+    """
+    station_port = request.GET['station-port'].encode('utf-8')
+    print("getting songinfo for port: " + station_port)
+    poller = MPDPoller(station_port)
+    poller.connect()
+    current_song = poller.get_current_song()
+    poller.disconnect()
+    print str(current_song)
+    return render_to_response('stations_stationdetails.html',
+                              {'current_song': current_song},
+                              context_instance=RequestContext(request))
+    
 
+def render_chat(request):
+    """
+
+    gets html for list of the 10 last chat messages
+    and renders it
+
+    """
+    chatlist = []
+    chatobjects = Chat.objects.order_by('-c_timestamp').all()[:10]
+    for chat in chatobjects:
+        chattime = str(chat.c_timestamp)[:10] + ", " + str(chat.c_timestamp)[11:16]
+        chatlist.append({'content':chat.c_content,'author':chat.c_username,'timestamp':chattime})
+    return render_to_response('chat_chatcontent.html',
+                              {'chatlist':chatlist},
+                              context_instance=RequestContext(request))
+    
+
+def post_chat(request):
+    from datetime import datetime
+    """
+
+    posts a chatmessage to the database
+
+    """
+    content = request.POST['chatmessage'].encode('utf-8')
+    if content and content != "":
+        if request.user.first_name != "":
+            author = request.user.first_name
+        else:
+            author = str(request.user)
+        t = datetime.now()
+        chat_obj = Chat(c_content=content,c_username = author,c_timestamp = t)
+        chat_obj.save()
+    return HttpResponse()
+
+    
+
+def stationdetails(request): # obsolet
+    station_port = request.GET['station_port'].encode('utf-8')
+    current_song = get_current_song(station_port)
+    for e in STATIONS:
+        if e['admin_port'] == int(station_port):
+            station_name = e['stream_name']
+    queue = get_queue(station_port)
+    playlists = get_playlists(station_port)
+    playlists_withsongs = []
+    for playlist in playlists:
+        playlists_withsongs.append( { 'name' : playlist['playlist'], 'songs' : get_songs_from_playlist( station_port,playlist [ 'playlist' ] ) } ) 
+    return render_to_response('stationdetails.html',
+                              {'lastfm_key':LASTFM_API_KEY,
+                               'lastfm_url':LASTFM_API_URL,
+                               'cur_song':current_song,
+                               'station_port':station_port,
+                               'station_name':station_name,
+                               'page':"stationdetails",
+                               'queue':queue,
+                               'playlists':playlists,
+                               'playlists_withsongs':playlists_withsongs},
+                              context_instance=RequestContext(request))
+
+def nowplaying(request): #obsolet
+    try:
+        station_port = request.GET['station_port']
+        current_song = get_current_song(station_port.encode('utf-8'))
+        return HttpResponse(json.dumps(current_song),mimetype="application/json")
+    except:
+        current_song = False
+        return HttpResponse(json.dumps(current_song),mimetype="application/json")
+
+
+### Ajax ###
 
 def playqueue(request):
-	cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
-	return render_to_response('playqueue.html',{'playlist':cur_playlist},context_instance=RequestContext(request))
-
-
-### Ajax
+    cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
+    return render_to_response('playqueue.html',{'playlist':cur_playlist},context_instance=RequestContext(request))
 
 def mpdcommands(request, playlist=""):
-	port = request.GET['port'].encode('utf-8')
-	mpdcommand = request.GET['mpdcommand'].encode('utf-8')
-	client = MPDClient()
-	client.connect(HOST,port)
-	client.password(PASSW)
-	if mpdcommand == "get_current_song":
-		client.get_current_song()
-	elif mpdcommand == "get_playlists":
-		client.listplaylists()
-	elif mpdcommand == "play":
-		client.play()
-	elif mpdcommand == "next":
-		client.next()
-	elif mpdcommand == "previous":
-		client.previous()
-	elif mpdcommand == "pause":
-		client.pause()
-	elif mpdcommand == "stop":
-		client.stop()
-	client.disconnect()
-	return HttpResponse()
-	
-def get_chat(request):
-	response = []
-	chats = Chat.objects.order_by('-c_timestamp').all()[:10]
-	for chat in chats:
-		chattime = str(chat.c_timestamp)[:10] + ", " + str(chat.c_timestamp)[11:16]
-		response.append({'content':chat.c_content,'author':chat.c_username,'timestamp':chattime})
-	return HttpResponse(json.dumps(response),mimetype="application/json")
+    port = request.GET['port'].encode('utf-8')
+    mpdcommand = request.GET['mpdcommand'].encode('utf-8')
+    client = MPDClient()
+    client.connect(HOST,port)
+    client.password(PASSW)
+    if mpdcommand == "get_current_song":
+        client.get_current_song()
+    elif mpdcommand == "get_playlists":
+        client.listplaylists()
+    elif mpdcommand == "play":
+        client.play()
+    elif mpdcommand == "next":
+        client.next()
+    elif mpdcommand == "previous":
+        client.previous()
+    elif mpdcommand == "pause":
+        client.pause()
+    elif mpdcommand == "stop":
+        client.stop()
+    client.disconnect()
+    return HttpResponse()
 
-def chatpush(request):
-	from datetime import datetime
-	content	 = request.POST['chat_content'].encode('utf-8')
-	if request.user.first_name != "":
-		author = request.user.first_name
-	else:
-		 author = str(request.user)
-	t = datetime.now()
-	chat_obj = Chat(c_content=content,c_username = author,c_timestamp = t)
-	chat_obj.save()
-	return HttpResponse()
+
+def logout_view(request):
+    """
+        
+        logs the user out and redirects to login
+    
+    """
+    logout(request)
+    return HTTPResponseRedirect('/')('/')
+
+
+

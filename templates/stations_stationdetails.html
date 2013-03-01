@@ -1,0 +1,92 @@
+<!-- Content of stations_stationdetails.html
+    ================================================== -->
+    
+<div class="tabbable">
+
+		<ul class="nav nav-tabs">
+			  <li class="active"><a href="#nowplaying" data-toggle="tab">Now Playing</a></li>
+			  <li><a href="#artistinfo" data-toggle="tab">Artistinfo</a></li>
+			  <li><a href="#tab3" data-toggle="tab">Play Queue</a></li>
+			  <li><a href="#tab4" data-toggle="tab">Playlists</a></li>
+			  <li><a href="#tab5" data-toggle="tab">Library</a></li>
+			  <li><a href="#tab6" data-toggle="tab">...</a></li>
+		</ul>
+	
+		<div class="tab-content">
+		
+				<div class="tab-pane active" id="nowplaying"> <!-- ** tab nowplaying ** -->
+					
+						<div class="pull-left imgcontainer">
+								<img class="img-polaroid lastfm" src="http://cdn.last.fm/flatness/responsive/2/noimage/default_album_300_g4.png" />
+						</div>
+						<div id="trackinfo" style="display:none" class="pull-left">
+								
+						</div>
+				</div> <!-- ** end tab nowplaying ** -->
+				
+				<div class="tab-pane" id="artistinfo"> <!-- ** end tab artistinfo ** -->
+						
+						<div class="pull-left imgcontainer">
+								<img class="img-polaroid pull-left" src="http://cdn.last.fm/flatness/responsive/2/noimage/default_artist_140_g2.png" />
+						</div>
+						<p>
+								<strong></strong>
+								<br>
+								<em></em>
+								<br>
+						</p>
+						<div id="bio">
+						</div>
+						
+				</div> <!-- ** end tab artistinfo ** -->
+				
+				<div class="tab-pane" id="tab3"> <!-- ** tab playqueue ** -->
+						<table class="table table-condensed table-striped">
+								<thead>
+										<tr>			
+												<th>Track</th>
+												<th>Title</th>
+												<th>Artist</th>
+												<th>Album</th>
+												<th>Date</th>
+												<th>Genre</th>
+												<th>Duration</th>		
+										</tr>		
+								</thead>
+								<tbody>
+										{% for e in queue%}
+										<tr>
+												<td>{{e.track}}</td>
+												<td>{{e.title}}</td>
+												<td>{{e.artist}}</td>
+												<td>{{e.album}}</td>
+												<td>{{e.date}}</td>
+												<td>{{e.genre}}</td>
+												<td>{{e.time}}</td>
+										</tr>
+										{% endfor %}
+								</tbody>
+						</table>
+				</div> <!-- ** end tab playqueue ** -->
+				
+				<div class="tab-pane" id="tab4"> <!-- ** tab playlist ** -->
+				</div> <!-- ** end tab playlist ** -->
+				
+				<div class="tab-pane" id="tab5">
+						<div id="artistinfo">
+						</div>
+				</div>
+				
+				<div class="tab-pane" id="tab6">
+					<div id="artistinfo">
+					</div>
+				</div>
+				
+		</div> <!-- ** end tab-content ** -->
+		
+</div> <!-- ** end tabbable ** -->
+			
+
+<script type="text/javascript">
+    
+</script>

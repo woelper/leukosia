@@ -1,78 +1,149 @@
+{% load jsonify %}
+
 <!DOCTYPE html>
 <html lang="de">
   <head>
 	  
-    <meta charset="utf-8">
-    <title>leukosia</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
-
-    <!-- Le styles -->
-    <link href="{{STATIC_URL}}ext/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link type="text/css" rel="stylesheet" href="{{STATIC_URL}}css/style.css" />
+	    <meta charset="utf-8">
+	    <title>leukosia</title>
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <meta name="description" content="">
+	    <meta name="author" content="">
+	 
+	
+	    <!-- Le styles -->
+	    <link href="{{STATIC_URL}}ext/bootstrap/css/bootstrap.css" rel="stylesheet">
+	    <link type="text/css" rel="stylesheet" href="{{STATIC_URL}}css/style.css" />
+	    
+	    
 
   </head>
 
   <body>
+  
+  	<!-- Navbar
+    ================================================== -->
+  
+	<div class="navbar navbar-fixed-top"> 
+			<div class="navbar-inner"> 
+					<div class="container-fluid">
+						
+								<!-- <div class="pull-left">
+									<img src="{{STATIC_URL}}img/logo_4_w.png">
+								</div> -->
+								<a class="brand" href="#">leuko fm</a>
+								{% if page != "login" %}
+								
+								
+								
+								<ul class="nav pull-right">
+										<li class="dropdown">
+								    			<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+													      <i class="icon-user"></i> {{ username }}
+													      <b class="caret"></b>
+								   	 			</a>
+								    			<ul class="dropdown-menu">
+								      					 <li>
+								      					 		<a tabindex="-1" href="#">
+								      					 				<i class="icon-wrench"></i> Settings
+								      					 		</a>
+								      					 </li>
+														  <li class="divider"></li>
+														  <li>
+														  		<a tabindex="-1" href="/logout">
+														  				<i class="icon-off"></i> Logout
+														  		</a>
+														  </li>
+								    			</ul>
+								    			
+								  		</li>
+								</ul>
+								
+								<!-- HTML5 Audio Tag -->
+								<audio id="audiotag1" src=""></audio>
+								
+								{% endif%}
+					</div> <!-- end navbar-inner -->
+			</div> <!-- end navbar-inner -->
+	</div> <!-- end navbar -->
 
-	<div class="navbar navbar-inverse navbar-fixed-top">
-		<div class="navbar-inner">
-			<div class="container-fluid">
-				
-					<div class="pull-left">
-						<img src="{{STATIC_URL}}img/logo_4_w.png">
-					</div>
-					
-					{% if page != "login" %}
-					<p class="navbar-text pull-right">
-						logged in as <a class="navbar-link" href="#">username</a>
-					</p>
-					{% endif%}
-					<ul class="nav" id="nav">
-                    </ul>
-			</div>
-		</div>
-	</div> <!-- /navbar -->
 	
-	 <div class="container-fluid">
-		<div class="row-fluid">
-			<div class="content content-left span9" id="content">
-				{%block content%}
-				{% endblock %}
-			</div> <!-- /content-left -->
-			{% if page != "login" %}
-			<div class="span3 content-right">
-					<div class="content">
-						<audio id="audiotag1" src="http://leukosia.eu:8003" controls></audio>
-					</div>
-					<br>
-					<hr>
-					<form action="" method="post" onsubmit="push_chat();return false;">
-						<div class="input-append">
-						  <input id="chatcontent" name="chatcontent" type="text">
-						  <button id="chatbutton" class="btn" type="submit">Chat</button>
-						</div>
-					</form>
-					<div id="chat">Chat lädt...
-					</div>
-			</div> <!-- /content-right -->
-			{% endif %}
-		</div> <!-- /row fluid -->
-	</div> <!-- /fluid container -->
+	
+	<!-- Content
+    ================================================== -->
+	
+	
+	 <div class="container-fluid">  <!-- *** fluid container *** -->
+			<div class="row-fluid"> <!-- ** row fluid ** -->
+			
+							{% block content %}
+							{% endblock %}
+							
+					{% if page != "login" %}
+					<div class="content content-left span12"> <!-- * content-left * -->
+							<ul class="inline">
+									<li>
+											<h3>Radiostations</h3>
+									</li>
+									<li class="pull-right">
+											<h3><button type="button" class="btn" data-toggle="collapse" data-target="#stationlist"></h3>
+									</li>
+							</ul>
+							<div id="stationlist" class="collapse in">
+									{% for station in stationlist %}
+									
+									<ul class="inline" id="stationoverview_{{ station.admin_port }}">
+									
+									</ul>
+									<div id="stationdetails_{{ station.admin_port }}" class="collapse stationdetails">
+									loading station...
+							</div>
+									
+									{% endfor %}
+							</div>
+							
+
+							
+					</div> <!-- * end content-left * -->
+					
+					
+					<div class="span4 content-right">  <!-- * content-right * -->
+							
+					
+							
+					</div> <!-- * end content-right *-->
+					
+					<div id="chat1" class="span4 offset8 chat" style="display:none">
+						chat loading...
+					</div> 	<!-- end chat 1 -->
+					<div id="chat2" class="span4 offset8 chat">
+							<div class="container-fluid">
+									<a id="togglechat" role="button" class="btn btn-mini pull-right" onclick="$('.chat').toggle(); return false;">
+											<i class="icon-chevron-up"></i> Chat
+									</a>
+							</div>
+					</div> 	<!-- end chat 2-->
+					
+					{% endif %}
+				
+			</div> <!-- ** end row fluid **-->
+	</div> <!-- *** end fluid container *** -->
 
 
-	{% if page != "login" %}
-    <!-- Le javascript
+	
+	<!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="{{STATIC_URL}}ext/bootstrap/js/bootstrap.js"></script>
+
+
     <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="{{STATIC_URL}}ext/bootstrap/js/bootstrap.js"></script>
+   
+	
+	
+	{% if page != "login" %}
     
-    
-    <script type="text/javascript">
+   	<script type="text/javascript">
 		
 	var html = "";
 	var last_artist = "";
@@ -80,37 +151,132 @@
 	var cur_artist;
 	var cur_album;
 	var songupdater = false;
+	var main_interval = false;
 	var a = document.getElementsByTagName("audio")[0];
+	var last_fm_key = '{{ lastfm_key }}';
+	var lastfm_url = '{{ lastfm_url }}';
+	var stationlist = {{ stationlist|jsonify }};
 	
 	
-	<!-- Start -->
+
+	
 	$(document).ready(function () {
-		render_stationoverview ();
-		}
-	);
-	<!-- Update the Chat -->
-	$(document).ready(function () {
-		update_chat();
-		setInterval(update_chat,5000);
-		}
-	);
-	
-	function render_stationoverview () {
-		$('#content').html("loading...");
-		$.get('/stationoverview')
-		.done(function(data) {
-			if (songupdater) {
-				clearInterval(songupdater);
-				}
-			$('#content').html(data);
-			navhtml = '';
-			$('#nav').html(navhtml);
-			
+	/*
+	 *  On first load: 
+	 *  - renders the list view of the Stations
+	 *  - renders the chat-contents
+	 */
+	 		for (var i = 0; i < stationlist.length; i++) {
+				render_stationoverview(i);
 			}
-		);
+			//render_stationoverview();
+			render_chat();
+			
+			main_interval = setInterval(function() { 		// sets Interval for automatic page updates
+				for (var i = 0; i < stationlist.length; i++) {
+						render_stationoverview(i);
+				}
+				render_chat();
+			}, 5000);
+	});
+	
+	
+	function render_stationoverview(i) {
+	/* 
+	 *  gets the station infos via ajax request
+	 *  and renders the equivalent html id in the station overview
+	 */
+	 		$.get('/render-station-overview',{'port':stationlist[i].admin_port})
+			.done(function(html) {
+	 			$('#stationoverview_' + stationlist[i].admin_port).html(html);
+	 			return true;
+	 		});
 	}
 	
+	
+	function render_chat() {
+	/*
+	 *  renders the chat contents
+	 */
+		$.get("/render-chat/").done(function(html) {
+			$('#chat1').html(html);
+		});
+	}
+	
+	
+	function post_chat() {
+		/*
+		 *  post chat message to database
+		 */
+		chatmessage = document.getElementById('chatcontent').value;    	// get content from input
+		$.post('/post-chat/',{'chatmessage':chatmessage})				// post chatmessage
+		.success(function() {
+			render_chat();
+		});
+		$('#chatcontent').val("");									// set input to blank
+	}
+	
+	
+	function clearInterval (interval) {
+    /* 
+	 *  clears a given interval
+	 */
+		if (interval) {
+			clearInterval(interval);
+		}
+	}
+	
+	
+	
 	function render_stationdetails (station_port) {
+	/* 
+	 *  gets the html for the desired station and renders it
+	 */
+		last_artist = "";
+		last_album = "";
+		$('#stationdetails').html("loading...");
+		$.get('/render-station-details/',{'station-port': station_port}).done(function(html){
+			$('#stationdetails').html(html);
+		});
+	}
+	
+	
+	
+
+	function update_albumcover(artist,album) {
+		
+		$.getJSON(lastfm_url, {
+          "api_key": lastfm_key,
+          "format":   "json",
+          "artist":artist,
+          "album":album,
+          "method":"album.getInfo"
+        })
+        .done(function(data) {
+			$('#nowplaying').find("img").attr(data['album']['image'][3]['#text']);
+		});
+	}
+	
+	function update_artistinfo(artist) {
+		
+		$.getJSON("{{lastfm_url}}",{
+          "api_key":  "{{lastfm_key}}",
+          "format":   "json",
+          "artist": artist,
+          "method": "artist.getInfo"
+        })
+        .done(function(data) {
+			$('#artistinfo').find("img").attr(data['artist']['image'][3]['#text']);
+			$('#artistinfo').find("strong").attr(data['artist']['name']);
+			$('#artistinfo').find("em").attr(data['artist']['bio']['formationlist']['formation']['yearfrom']);
+			$('#artistinfo').find("div").attr(data['artist']['bio']['summary']);
+		});
+	}
+	
+	
+	
+	
+	function render_stationdetails_old (station_port) {
 			last_artist = "";
 			last_album = "";
 			$('#stationdetails').html("loading...");
@@ -133,7 +299,8 @@
 				}
 			);
 		}
-
+	
+	
 	
 	function update_nowplaying(station_port) {
 		$.getJSON('/nowplaying/',
@@ -167,71 +334,53 @@
 	}
 	
 
-	function update_chat() {
 		
-		$.getJSON("/ajaxchat/")
-		.done(function(data) {
-			var html = "";
-			for (var i=0; i<data.length; i++) { 
-				
-				html = html + "<p></p><small><strong>" + data[i].author + "</strong><span class='muted'> " + 
-					data[i].timestamp +  "</span><br>" +
-					data[i].content + "</small></p>	";
-			}
-			$('#chat').html(html);
-		});
-	}
-	
-
-	function push_chat() {
-		
-		content = document.getElementById('chatcontent').value;
-		$.post('/chatpush/',
-		{'chat_content':content});
-		$('#chatcontent').val("");
-		update_chat()
-		
-	}
 	
 	
 	
-		<!-- for csrf token in ajax -->
+	
 	$(document).ajaxSend(function(event, xhr, settings) {
-    function getCookie(name) {
-		var cookieValue = null;
-		if (document.cookie && document.cookie != '') {
-			var cookies = document.cookie.split(';');
-			for (var i = 0; i < cookies.length; i++) {
-				var cookie = jQuery.trim(cookies[i]);
-				// Does this cookie string begin with the name we want?
-				if (cookie.substring(0, name.length + 1) == (name + '=')) {
-					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-					break;
+		/*
+		 * this is for ajax csrf-authentification
+		 * see http://stackoverflow.com/questions/8238900/django-jquery-csrf-fix-does-not-work-on-ipad
+		 */
+		function getCookie(name) {
+			var cookieValue = null;
+			if (document.cookie && document.cookie != '') {
+				var cookies = document.cookie.split(';');
+				for (var i = 0; i < cookies.length; i++) {
+					var cookie = jQuery.trim(cookies[i]);
+					// Does this cookie string begin with the name we want?
+					if (cookie.substring(0, name.length + 1) == (name + '=')) {
+						cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+						break;
+					}
 				}
 			}
-		}
-		return cookieValue;
-    }
-    function sameOrigin(url) {
-		// url could be relative or scheme relative or absolute
-		var host = document.location.host; // host + port
-		var protocol = document.location.protocol;
-		var sr_origin = '//' + host;
-		var origin = protocol + sr_origin;
-		// Allow absolute or scheme relative URLs to same origin
-		return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
-			(url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
-			// or any other URL that isn't scheme relative or absolute i.e relative.
-			!(/^(\/\/|http:|https:).*/.test(url));
-    }
-    function safeMethod(method) {
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-
-    if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
-		xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-    }
+			return cookieValue;
+		    }
+	    function sameOrigin(url) {
+			// url could be relative or scheme relative or absolute
+			var host = document.location.host; // host + port
+			var protocol = document.location.protocol;
+			var sr_origin = '//' + host;
+			var origin = protocol + sr_origin;
+			// Allow absolute or scheme relative URLs to same origin
+			return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+				(url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+				// or any other URL that isn't scheme relative or absolute i.e relative.
+				!(/^(\/\/|http:|https:).*/.test(url));
+	    }
+	    function safeMethod(method) {
+	    	return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+	    }
+	
+	    if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+			xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+	    }
 	});
+	
+	
 </script>
    
   {% endif %}
