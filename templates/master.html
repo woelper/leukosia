@@ -204,11 +204,8 @@
 					station_port = stationlist[i]['admin_port'];
 				
 					render_stationoverview(station_port); //renders the station information of current station
-
-					
 					current_track = $('#hidden-title_' + station_port).val();
-					//alert(current_track);
-					//alert(stationlist[i]['last_track']);
+
 					if ((current_track != false) && (current_track != stationlist[i]['last_track'])) {
 					
 							if ($('#stationdetails_' + station_port).hasClass('in')) {
