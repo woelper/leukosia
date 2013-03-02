@@ -24,16 +24,15 @@ urlpatterns = patterns('',
     # urls for rendering dynamic content
     url(r'^render-station-overview/', 'webfrontend.views.render_station_overview'),
     url(r'^render-station-details/', 'webfrontend.views.render_station_details'),
+    url(r'^render-player/', 'webfrontend.views.render_player'),
     url(r'^render-chat/', 'webfrontend.views.render_chat'),
     
-        
     # urls for posting data to server
     url(r'^post-chat/', 'webfrontend.views.post_chat'),
     
     #url(r'^stationoverview/', 'webfrontend.views.stationoverview',name='index'),
-    url(r'^playqueue/', 'webfrontend.views.playqueue'),
-    url(r'^nowplaying/', 'webfrontend.views.nowplaying'),    
-    url(r'^mpdcommands/', 'webfrontend.views.mpdcommands'),
+    url(r'^playqueue/', 'webfrontend.views.playqueue'),    
+    url(r'^mpd-get-song/', 'webfrontend.views.mpd_get_song'),
     
     
     # Uncomment the next line to enable the admin:

@@ -216,7 +216,7 @@ def main(request):
 	username = request.user.username
 	return render_to_response('master.html',
 							{'lastfm_key': LASTFM_API_KEY, 'lastfm_url': LASTFM_API_URL,
-							'username': username, 'stationlist':stationlist},
+							'username': username, 'stationlist':stationlist, 'mpdhost': HOST},
 							context_instance=RequestContext(request))
 
 
@@ -227,7 +227,7 @@ def render_station_overview(request):
 	and renders it
 
 	"""
-	current_song = False
+	current_song = ""
 	stationlist = get_stationlist()
 	admin_port = request.GET['port'].encode('utf-8')
 	for station in stationlist:
@@ -242,12 +242,13 @@ def render_station_overview(request):
 		current_song = poller.get_current_song()
 		poller.disconnect()
 	except:
-		print "Exception"
+		current_song = False
 	return render_to_response('stations_stationoverview.html',
-                                  {'current_song': current_song, 
-                                  'mpdhost': HOST, 'admin_port':admin_port, 
-                                  'stream_port':stream_port,'stream_name':stream_name},
-                                  context_instance=RequestContext(request))
+									{'current_song': current_song, 
+									'admin_port':admin_port, 
+									'stream_port':stream_port,'stream_name':stream_name},
+									context_instance=RequestContext(request))
+   
    
     
 def render_station_details(request):
@@ -264,7 +265,6 @@ def render_station_details(request):
 	current_song = poller.get_current_song()
 	poller.disconnect()  
 	current_song['time'] = str(datetime.timedelta(seconds=int(current_song['time'])))[2:]
-	print str(current_song)
 	#artist = lastfm.get_artist("System of a Down")
 	#print artist
 	#print artist.get_cover_image(4)
@@ -274,6 +274,19 @@ def render_station_details(request):
 							'station_port':station_port},
 							context_instance=RequestContext(request))
     
+
+def render_player(request):
+    """
+
+    gets html for list of the 10 last chat messages
+    and renders it
+
+    """
+    return render_to_response('player.html',
+                              {},
+                              context_instance=RequestContext(request))
+
+
 
 def render_chat(request):
     """
@@ -318,28 +331,20 @@ def playqueue(request):
     cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
     return render_to_response('playqueue.html',{'playlist':cur_playlist},context_instance=RequestContext(request))
 
-def mpdcommands(request, playlist=""):
-    port = request.GET['port'].encode('utf-8')
-    mpdcommand = request.GET['mpdcommand'].encode('utf-8')
-    client = MPDClient()
-    client.connect(HOST,port)
-    client.password(PASSW)
-    if mpdcommand == "get_current_song":
-        client.get_current_song()
-    elif mpdcommand == "get_playlists":
-        client.listplaylists()
-    elif mpdcommand == "play":
-        client.play()
-    elif mpdcommand == "next":
-        client.next()
-    elif mpdcommand == "previous":
-        client.previous()
-    elif mpdcommand == "pause":
-        client.pause()
-    elif mpdcommand == "stop":
-        client.stop()
-    client.disconnect()
-    return HttpResponse()
+def mpd_get_song(request):
+	port = request.GET['station_port'].encode('utf-8')
+	current_song = ""
+	try:
+		poller = MPDPoller(port)
+		poller.connect()
+		current_song = poller.get_current_song()
+		poller.disconnect()
+	except:
+		current_song = False
+	if current_song:
+		return HttpResponse(current_song['title'])
+	else:
+		return HttpResponse("")
 
 
 def logout_view(request):
