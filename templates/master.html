@@ -206,7 +206,7 @@
 					render_stationoverview(station_port); //renders the station information of current station
 					current_track = $('#hidden-title_' + station_port).val();
 
-					if ((current_track != false) && (current_track != stationlist[i]['last_track'])) {
+					if ((current_track != false) && (current_track != stationlist[i]['last_track'])) { //only update page when track changes
 					
 							if ($('#stationdetails_' + station_port).hasClass('in')) {
 								render_stationoverview(station_port); //renders the station information of current station
