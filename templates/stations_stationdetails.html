@@ -16,9 +16,9 @@
 		
 				<div class="tab-pane active" id="nowplaying_{{ station_port }}"> <!-- ** tab nowplaying ** -->
 
-										<img class="img-polaroid pull-left span3" src="http://cdn.last.fm/flatness/responsive/2/noimage/default_artist_140_g2.png" />
+										<img class="img-polaroid pull-left span2" src="http://cdn.last.fm/flatness/responsive/2/noimage/default_artist_140_g2.png" />
 
-										<div id="trackinfo" class="span9">
+										<div id="trackinfo" class="span10">
 												<strong>{{ current_song.title }}</strong>
 												<br>
 												{{ current_song.artist }}
@@ -39,17 +39,13 @@
 				</div> <!-- ** end tab nowplaying ** -->
 				
 				<div class="tab-pane" id="artistinfo_{{ station_port }}"> <!-- ** end tab artistinfo ** -->
-						
-						<div class="pull-left span2">
-								<img class="img-polaroid pull-left" src="http://cdn.last.fm/flatness/responsive/2/noimage/default_artist_140_g2.png" />
-						</div>
-						<p>
-								<strong>{{ current_song.artist }}</strong>
-								<br>
-								<em></em>
-								<br>
-						</p>
-						<div id="bio">
+
+						<img class="img-polaroid pull-left span2" src="http://cdn.last.fm/flatness/responsive/2/noimage/default_artist_140_g2.png" />
+						<div class="span10">
+								<strong><p id="title">{{ current_song.artist }}</p></strong>
+								<em><p id="genre"></p></em>
+								<p id="bio"></p>
+								
 						</div>
 						
 				</div> <!-- ** end tab artistinfo ** -->
@@ -103,36 +99,4 @@
 
 <script type="text/javascript">
 
-		
-	function update_albumcover(station_port,artist,album) {
-		
-		$.getJSON(lastfm_url, {
-          "api_key": lastfm_key,
-          "format":   "json",
-          "artist":artist,
-          "album":album,
-          "method":"album.getInfo"
-        })
-        .done(function(data) {
-			$('#nowplaying_' + station_port).find("img")
-				.attr('src',data['album']['image'][3]['#text']);
-		});
-	}
-	
-		function update_artistinfo(artist) {
-		
-		$.getJSON("{{lastfm_url}}", {
-          "api_key":  "{{lastfm_key}}",
-          "format":   "json",
-          "artist": artist,
-          "method": "artist.getInfo"
-        })
-        .done(function(data) {
-			$('#artistinfo').find("img").attr(data['artist']['image'][3]['#text']);
-			$('#artistinfo').find("strong").attr(data['artist']['name']);
-			$('#artistinfo').find("em").attr(data['artist']['bio']['formationlist']['formation']['yearfrom']);
-			$('#artistinfo').find("div").attr(data['artist']['bio']['summary']);
-		});
-	}
-    
 </script>

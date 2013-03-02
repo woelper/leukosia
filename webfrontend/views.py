@@ -20,7 +20,7 @@ except ImportError:
 
     
 from mpd import MPDClient, MPDError, CommandError
-import pylast
+#import pylast
 from webfrontend.models import *
 
 logger = logging.getLogger(__name__)
@@ -149,8 +149,8 @@ PASSW = Settings.objects.all()[0].mpd_pass.encode('utf_8')
 LASTFM_API_URL = Settings.objects.all()[0].lastfm_url.encode('utf_8')
 LASTFM_API_KEY = Settings.objects.all()[0].lastfm_key.encode('utf_8')
 
-lastfm = pylast.LastFMNetwork(api_key = LASTFM_API_KEY, api_secret = 
-							"", username = "", password_hash = "")
+#lastfm = pylast.LastFMNetwork(api_key = LASTFM_API_KEY, api_secret = 
+#							"", username = "", password_hash = "")
 
 
 
@@ -169,7 +169,6 @@ def authenticate(username=None, password=None):
         msg = "The username and/or password were incorrect."
     return user, msg
     
-
 def get_stationlist():
 	station_objects = Stations.objects.all()
 	stationlist = []
@@ -177,6 +176,7 @@ def get_stationlist():
 		station = model_to_dict(station)
 		stationlist.append(station)
 	return stationlist
+
 
 ### Controls
 
@@ -310,40 +310,6 @@ def post_chat(request):
         chat_obj.save()
     return HttpResponse()
 
-    
-
-def stationdetails(request): # obsolet
-    station_port = request.GET['station_port'].encode('utf-8')
-    current_song = get_current_song(station_port)
-    for e in STATIONS:
-        if e['admin_port'] == int(station_port):
-            station_name = e['stream_name']
-    queue = get_queue(station_port)
-    playlists = get_playlists(station_port)
-    playlists_withsongs = []
-    for playlist in playlists:
-        playlists_withsongs.append( { 'name' : playlist['playlist'], 'songs' : get_songs_from_playlist( station_port,playlist [ 'playlist' ] ) } ) 
-
-    return render_to_response('stationdetails.html',
-                              {'lastfm_key':LASTFM_API_KEY,
-                               'lastfm_url':LASTFM_API_URL,
-                               'cur_song':current_song,
-                               'station_port':station_port,
-                               'station_name':station_name,
-                               'page':"stationdetails",
-                               'queue':queue,
-                               'playlists':playlists,
-                               'playlists_withsongs':playlists_withsongs},
-                              context_instance=RequestContext(request))
-
-def nowplaying(request): #obsolet
-    try:
-        station_port = request.GET['station_port']
-        current_song = get_current_song(station_port.encode('utf-8'))
-        return HttpResponse(json.dumps(current_song),mimetype="application/json")
-    except:
-        current_song = False
-        return HttpResponse(json.dumps(current_song),mimetype="application/json")
 
 
 ### Ajax ###

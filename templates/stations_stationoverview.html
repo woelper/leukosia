@@ -3,11 +3,11 @@
 
 				
 				<li>			
-						<button type="button" class="btn btn-primary btn-mini" 
+						<button id="btn-show-{{ admin_port }}" type="button" class="btn btn-mini" 
 								data-toggle="collapse" data-target="#stationdetails_{{ admin_port }}" 
 								onclick="render_stationdetails('{{ admin_port }}',
 								'{{ current_song.artist }}','{{ current_song.album }}'); return false;">
-								<i class="icon-chevron-down icon-white"></i>
+								<i class="icon-chevron-down"></i>
 						</button>
 				</li>
 				
@@ -45,7 +45,9 @@
 						</p>
 				</li>
 				{% endif %}
-
+				
+				<input type="hidden" id="hidden-artist_{{ admin_port }}" value="{{ current_song.artist }}"></input>
+				<input type="hidden" id="hidden-album_{{ admin_port }}" value="{{ current_song.album }}"></input>
 
 	<!-- Le javascript from stations_stationlist.html
     ================================================== -->

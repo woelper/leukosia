@@ -80,15 +80,16 @@
 							{% endblock %}
 							
 					{% if page != "login" %}
+					
 					<div class="content content-left span12"> <!-- * content-left * -->
-							<ul class="inline">
+							<!-- <ul class="inline">
 									<li>
 											<h3>Radiostations</h3>
 									</li>
 									<li class="pull-right">
 											<h3><button type="button" class="btn" data-toggle="collapse" data-target="#stationlist"></h3>
 									</li>
-							</ul>
+							</ul> -->
 							<div id="stationlist" class="collapse in">
 								
 									{% for station in stationlist %}
@@ -106,12 +107,6 @@
 							
 					</div> <!-- * end content-left * -->
 					
-					
-					<div class="span4 content-right">  <!-- * content-right * -->
-							
-					
-							
-					</div> <!-- * end content-right *-->
 					
 					<div id="chat1" class="span4 offset8 chat" style="display:none">
 						chat loading...
@@ -165,22 +160,30 @@
 	 *  - renders the list view of the Stations
 	 *  - renders the chat-contents
 	 */
-	 		for (var i = 0; i < stationlist.length; i++) {
-				render_stationoverview(i);
-			}
-			//render_stationoverview();
-			render_chat();
-			
-			//main_interval = setInterval(function() { 		// sets Interval for automatic page updates
-			//	for (var i = 0; i < stationlist.length; i++) {
-			//			render_stationoverview(i);
-			//	}
-			//	render_chat();
-			//}, 5000);
+		updatePage();
+					
+		main_interval = setInterval(function() { 		// sets Interval for automatic page updates
+							updatePage();
+						}, 5000);
 	});
 	
+	function updatePage() {
+		for (var i = 0; i < stationlist.length; i++) {
+			if ($('#stationdetails_' + stationlist[i]['admin_port']).hasClass('in')) {
+				render_stationoverview(i,true);
+				render_stationdetails(stationlist[i]['admin_port'])
+				update_albumcover(stationlist[i]['admin_port']);
+				update_artistinfo(stationlist[i]['admin_port']);
+			}
+			else {
+				render_stationoverview(i,false);
+			}
+		}
+		render_chat();
+	}
 	
-	function render_stationoverview(i) {
+	
+	function render_stationoverview(i,status) {
 	/* 
 	 *  gets the station infos via ajax request
 	 *  and renders the equivalent html id in the station overview
@@ -226,82 +229,67 @@
 	}
 	
 	
-	function render_stationdetails(station_port,artist,album) {
+	function render_stationdetails(station_port) {
 	/* 
 	 *  gets the html for the desired station and renders it
 	 */
+		var artist = $('#hidden-artist_' + station_port).val();
+		var album = $('#hidden-album_' + station_port).val();
+		
 		last_artist = "";
 		last_album = "";
 		$.get('/render-station-details/',{'station-port': station_port}).done(function(html){
 			$('#stationdetails_' + station_port).html(html);
 			$('#stationdetails_'+station_port).on('shown', function () {
-				update_albumcover(station_port,artist,album);
+				update_albumcover(station_port);
+				update_artistinfo(station_port);
 			});
+			
 		});
 	}
 	
 	
 
+		
+	function update_albumcover(station_port) {
+		
+		var artist = $('#hidden-artist_' + station_port).val();
+		var album = $('#hidden-album_' + station_port).val();
+		
+		$.getJSON(lastfm_url, {
+          "api_key": lastfm_key,
+          "format": "json",
+          "artist": artist,
+          "album": album,
+          "method":"album.getInfo"
+        })
+        .done(function(data) {
+			$('#nowplaying_' + station_port).find("img")
+				.attr('src',data['album']['image'][3]['#text']);
+		});
+	}
 	
-	
-	function render_stationdetails_old (station_port) {
-			last_artist = "";
-			last_album = "";
-			$('#stationdetails').html("loading...");
-			$.get('/stationdetails',{'station_port':station_port})
-			.done(function(data) {
-				$('#stationdetails').html(data);
-				navhtml = '<li onclick="render_stationoverview()" style="cursor:pointer;"><a>Overview</a></li>'+
-							'<li class="divider-vertical"></li>'+
-							'<li onclick="previous()" style="cursor:pointer;"><a><i class="icon-fast-backward icon-white"></i></a></li>'+
-							'<li onclick="play()" style="cursor:pointer;"><a><i class="icon-play icon-white"></i></a></li>'+
-							'<li onclick="pause()" style="cursor:pointer;"><a><i class="icon-pause icon-white"></i></a></li>'+
-							'<li onclick="stop()" style="cursor:pointer;"><a><i class="icon-stop icon-white"></i></a></li>'+
-							'<li onclick="next()" style="cursor:pointer;"><a><i class="icon-fast-forward icon-white"></i></a></li>';
-				$('#nav').html(navhtml);
-				<!-- Update the Current Song -->
-				update_nowplaying(station_port);
-				songupdater = setInterval(function() {
-					update_nowplaying(station_port)},2000);
-				
+	function update_artistinfo(station_port) {
+		
+		var artist = $('#hidden-artist_' + station_port).val();
+		
+		$.getJSON(lastfm_url, {
+          "api_key": lastfm_key,
+          "format": "json",
+          "artist": artist,
+          "method": "artist.getInfo"
+        })
+        .done(function(data) {
+			var genres = "";
+			for (i in data['artist']['tags']['tag']) {
+				genres = genres + data['artist']['tags']['tag'][i]['name'] + ", ";
 				}
-			);
-		}
-	
-	
-	
-	function update_nowplaying(station_port) {
-		$.getJSON('/nowplaying/',
-		{'station_port' : station_port})
-		.done(function(data) { 
-			cur_artist = data.artist;
-			cur_album = data.album;
-			html = "<b>" + data.title + "</b><br><br>" +
-				"<b>" + data.artist + "</b><br>" +
-				data.album + " (" + data.date + ")<br><br>" +
-				"<small>" +
-				"Genre: " + data.genre + "<br>" +
-				"Track: "+ data.track + "<br>" +
-				"Length: " + data.time + "<br>" +
-				"</small>";
-			$("#trackinfo").html(html);
-			
-			$('#trackinfo').show();
-			
-			if (cur_album != last_album) { //if album changes
-				$('#albumcovercontainer').html('<img src="{{STATIC_URL}}img/loading.gif" />');
-				update_albumcover(cur_artist,cur_album);
-			}
-			if (last_artist != cur_artist) { //if album changes
-				$('#artistinfo').html('<img src="{{STATIC_URL}}img/loading.gif" />');
-				update_artistinfo(cur_artist);
-			}
-			last_artist = cur_artist;
-			last_album = cur_album
+			$('#artistinfo_' + station_port).find("img").attr('src',data['artist']['image'][3]['#text']);
+			$('#artistinfo_' + station_port).find("#genre").html(genres.substr(0,genres.length-2));
+			$('#artistinfo_' + station_port).find("#bio").html(data['artist']['bio']['summary']);
 		});
 	}
-	
-
+    
 		
 	
 	
