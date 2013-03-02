@@ -92,7 +92,7 @@
 			<div class="row-fluid">
 					<div class="span1">
 					<button id="btn-show-{{ station.admin_port }}" type="button" class="btn btn-mini"
-							onclick="render_stationdetails('{{ station.admin_port }}'); return false;"
+							
 							data-toggle="collapse" data-target="#stationdetails_{{ station.admin_port }}">
 							<i class="icon-chevron-down">
 							</i>
@@ -178,20 +178,21 @@
 	 *  - renders the list view of the Stations
 	 *  - renders the chat-contents
 	 */
-		
-		for (i in stationlist) {
-			stationlist[i]['last_track'] = "#####";
-		}
 		updatePage();
+		
+		for (i in stationlist) { 		// inital page rendering
+			station_port = stationlist[i]['admin_port'];
+			stationlist[i]['last_track'] = "#####";
+			render_stationoverview(station_port);
+			render_stationdetails(station_port);
+			update_lastfm_songinfo(station_port);
+			update_lastfm_artistinfo(station_port);
+			//alert($('#hidden-title_' + stationlist[i]['admin_port']).val());
+		}
+		
 					
 		main_interval = setInterval(function() { 		// sets Interval for automatic page updates
-				
-				//for (var i = 0; i < stationlist.length; i++) {
-				//	$.get('/mpd-get-song/',{'station_port':station_port}).done(function(current_song) {
-				//		checkPageUpdate(station_port, current_song);
-				//});
 				updatePage();
-				
 			}, 5000);
 	});
 	
@@ -201,16 +202,28 @@
 			for (i in stationlist) {
 				
 					station_port = stationlist[i]['admin_port'];
+				
+					render_stationoverview(station_port); //renders the station information of current station
+
 					
-					if ($('#stationdetails_' + station_port).hasClass('in')) {
-						render_stationoverview(station_port); //renders the station information of current station
-						update_lastfm_songinfo(station_port);
-						update_lastfm_artistinfo(station_port);
+					current_track = $('#hidden-title_' + station_port).val();
+					//alert(current_track);
+					//alert(stationlist[i]['last_track']);
+					if ((current_track != false) && (current_track != stationlist[i]['last_track'])) {
+					
+							if ($('#stationdetails_' + station_port).hasClass('in')) {
+								render_stationoverview(station_port); //renders the station information of current station
+								//render_stationdetails(station_port);
+								update_lastfm_songinfo(station_port);
+								update_lastfm_artistinfo(station_port);
+							}
+							else {
+								render_stationoverview(station_port);
+								//render_stationdetails(station_port);
+							}
 					}
-					else {
-						render_stationoverview(station_port);
-						//render_stationdetails(station_port);
-					}
+					
+					stationlist[i]['last_track'] = current_track;
 					
 					render_chat();
 					render_player();
