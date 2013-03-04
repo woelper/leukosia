@@ -119,6 +119,7 @@ class MPDPoller(object):
         # Hurray!  We got the current queue without any errors!
         for song in queue:
             song['time'] = str(datetime.timedelta(seconds=int(song['time'])))
+            print song
         return queue
     
     
@@ -256,6 +257,7 @@ def render_station_overview(request):
 			admin_port = str(station['admin_port'])
 			stream_port = str(station['stream_port'])
 			stream_name = station['stream_name']
+			#print ('test')
 	try:
 		poller = MPDPoller(admin_port)
 		poller.connect()
@@ -267,7 +269,7 @@ def render_station_overview(request):
 		
 	return render_to_response('stations_stationoverview.html',
 									{'current_song': current_song, 
-									'admin_port':admin_port, 
+									'admin_port':admin_port,
 									'stream_port':stream_port,
 									'stream_name':stream_name, 
 									'status': status},
@@ -282,11 +284,14 @@ def render_station_details(request):
 	and renders it
 
 	"""
+	#queue="asi"
 	station_port = request.GET['station-port'].encode('utf-8')
 	print("getting songinfo for port: " + station_port)
 	poller = MPDPoller(station_port)
 	poller.connect()
 	current_song = poller.get_current_song()
+	queue = poller.get_queue()
+	print str(queue)
 	poller.disconnect()  
 	current_song['time'] = str(datetime.timedelta(seconds=int(current_song['time'])))[2:]
 	#artist = lastfm.get_artist("System of a Down")
@@ -295,7 +300,8 @@ def render_station_details(request):
 	
 	return render_to_response('stations_stationdetails.html',
 							{'current_song': current_song,
-							'station_port':station_port},
+							'station_port':station_port,
+							'queue':queue},
 							context_instance=RequestContext(request))
     
 

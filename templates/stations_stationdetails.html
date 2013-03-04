@@ -64,15 +64,15 @@
 												</tr>		
 										</thead>
 										<tbody>
-												{% for e in queue%}
+												{% for a in playqueue%}
 												<tr>
-														<td>{{e.track}}</td>
-														<td>{{e.title}}</td>
-														<td>{{e.artist}}</td>
-														<td>{{e.album}}</td>
-														<td>{{e.date}}</td>
-														<td>{{e.genre}}</td>
-														<td>{{e.time}}</td>
+														<td>{{a.track}}</td>
+														<td>{{a.title}}</td>
+														<td>{{a.artist}}</td>
+														<td>{{a.album}}</td>
+														<td>{{a.date}}</td>
+														<td>{{a.genre}}</td>
+														<td>{{a.time}}</td>
 												</tr>
 												{% endfor %}
 										</tbody>
