@@ -11,14 +11,15 @@
 <div class="span8">
 		<p>
 		{% if status.state == "play" %}
-			<span class="label label-success">playing</span>
+			<span class="label label-success">playing</span> 
 		{% endif %}
 		{% if status.state == "pause" %}
-			<span class="label">paused</span>
+			<span class="label">paused</span> 
 		{% endif %}
 		{% if status.state == "stop" %}
-			<span class="label">stopped</span>
+			<span class="label">stopped</span> 
 		{% endif %}
+		
 		{{ current_song.artist }} - {{ current_song.title }}
 
 		{% if current_song.genre %}

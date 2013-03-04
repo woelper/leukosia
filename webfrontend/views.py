@@ -116,9 +116,9 @@ class MPDPoller(object):
             # Failed again, just give up
             except (MPDError, IOError) as e:
                 raise PollerError("Couldn't retrieve playlist: %s" % e)
-        # Hurray!  We got the current song without any errors!
+        # Hurray!  We got the current queue without any errors!
         for song in queue:
-            song['time'] = str(datetime.timedelta(seconds=int(e['time'])))
+            song['time'] = str(datetime.timedelta(seconds=int(song['time'])))
         return queue
     
     
