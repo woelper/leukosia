@@ -14,18 +14,16 @@
 			<span class="label label-success">playing</span> 
 		{% endif %}
 		{% if status.state == "pause" %}
-			<span class="label">paused</span> 
+			<span class="label label-warning">paused</span> 
 		{% endif %}
 		{% if status.state == "stop" %}
 			<span class="label">stopped</span> 
 		{% endif %}
-		
-		{{ current_song.artist }} - {{ current_song.title }}
-
-		{% if current_song.genre %}
-		<span class="muted">
-				({{ current_song.genre }})
-		</span>
+		{% if current_song %} 
+			{{ current_song.artist }} - {{ current_song.title }}
+			<span class="muted">
+					({{ current_song.genre }})
+			</span>
 		{% endif %}
 </div>
 

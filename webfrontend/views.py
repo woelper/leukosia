@@ -119,7 +119,6 @@ class MPDPoller(object):
         # Hurray!  We got the current queue without any errors!
         for song in queue:
             song['time'] = str(datetime.timedelta(seconds=int(song['time'])))
-            print song
         return queue
     
     
@@ -261,19 +260,24 @@ def render_station_overview(request):
 	try:
 		poller = MPDPoller(admin_port)
 		poller.connect()
-		current_song = poller.get_current_song()
+		#current_song = poller.get_current_song()
 		status =  poller.get_status()
+		queue = poller.get_queue()
 		poller.disconnect()
+		for q in queue:
+			if q['id'] == status['songid']:
+				current_song = q
+				break
 	except:
 		current_song = False
-		
 	return render_to_response('stations_stationoverview.html',
-									{'current_song': current_song, 
-									'admin_port':admin_port,
-									'stream_port':stream_port,
-									'stream_name':stream_name, 
-									'status': status},
-									context_instance=RequestContext(request))
+						{'current_song': current_song,
+						'queue':queue,
+						'admin_port':admin_port,
+						'stream_port':stream_port,
+						'stream_name':stream_name, 
+						'status': status},
+						context_instance=RequestContext(request))
    
    
     
@@ -284,7 +288,6 @@ def render_station_details(request):
 	and renders it
 
 	"""
-	#queue="asi"
 	station_port = request.GET['station-port'].encode('utf-8')
 	print("getting songinfo for port: " + station_port)
 	poller = MPDPoller(station_port)
