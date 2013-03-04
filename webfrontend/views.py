@@ -291,7 +291,6 @@ def render_station_details(request):
 	poller.connect()
 	current_song = poller.get_current_song()
 	queue = poller.get_queue()
-	print str(queue)
 	poller.disconnect()  
 	current_song['time'] = str(datetime.timedelta(seconds=int(current_song['time'])))[2:]
 	#artist = lastfm.get_artist("System of a Down")

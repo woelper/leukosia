@@ -15,6 +15,8 @@
 	    <link href="{{STATIC_URL}}ext/bootstrap/css/bootstrap.css" rel="stylesheet">
 	    <link type="text/css" rel="stylesheet" href="{{STATIC_URL}}css/style.css" />
 	    
+	    <link href="{{STATIC_URL}}ext/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+	    
 	    
 
   </head>
@@ -67,7 +69,7 @@
 			</div> <!-- end navbar-inner -->
 	</div> <!-- end navbar -->
 
-	
+	<div class="visible-phone">Mobile view</div>
 	
 	<!-- Content
     ================================================== -->
@@ -205,6 +207,13 @@
 				
 					render_stationoverview(station_port); //renders the station information of current station
 					current_track = $('#hidden-title_' + station_port).val();
+					current_id = $('#hidden-id_' + station_port).val();
+					//$('.playlistrow').attr('class','playlistrow');
+					$('#playlistid_' + current_id).attr('class','success text-error');
+					
+
+
+					//alert(current_id)
 
 					if ((current_track != false) && (current_track != stationlist[i]['last_track'])) { //only update page when track changes
 					
@@ -213,10 +222,10 @@
 								//render_stationdetails(station_port);
 								update_lastfm_songinfo(station_port);
 								update_lastfm_artistinfo(station_port);
-							}
-							else {
-								render_stationoverview(station_port);
-								//render_stationdetails(station_port);
+								current_id = $('#hidden-id_' + station_port).val();
+								$('.playlistrow').attr('class','playlistrow');
+								$('#playlistid_' + current_id).attr('class','playlistrow success text-error');
+
 							}
 					}
 					

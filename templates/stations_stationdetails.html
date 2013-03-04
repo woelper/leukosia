@@ -51,7 +51,7 @@
 						</div> <!-- ** end tab artistinfo ** -->
 						
 						<div class="tab-pane" id="playqueue_{{ station_port }}"> <!-- ** tab playqueue ** -->
-								<table class="table table-condensed table-striped">
+								<table class="table table-condensed table-striped table-hover table-bordered">
 										<thead>
 												<tr>			
 														<th>Track</th>
@@ -64,8 +64,8 @@
 												</tr>		
 										</thead>
 										<tbody>
-												{% for a in playqueue%}
-												<tr>
+												{% for a in queue%}
+												<tr class="playlistrow" id='playlistid_{{a.id}}'>
 														<td>{{a.track}}</td>
 														<td>{{a.title}}</td>
 														<td>{{a.artist}}</td>
