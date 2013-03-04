@@ -6,9 +6,19 @@
 </div>
 
 
-{% if current_song.artist %}
-<div class="span10">
-		<p><i class="icon-music"></i>
+
+
+<div class="span8">
+		<p>
+		{% if status.state == "play" %}
+			<span class="label label-success">playing</span>
+		{% endif %}
+		{% if status.state == "pause" %}
+			<span class="label">paused</span>
+		{% endif %}
+		{% if status.state == "stop" %}
+			<span class="label">stopped</span>
+		{% endif %}
 		{{ current_song.artist }} - {{ current_song.title }}
 
 		{% if current_song.genre %}
@@ -17,7 +27,7 @@
 		</span>
 		{% endif %}
 </div>
-{% endif %}
+
 
 
 

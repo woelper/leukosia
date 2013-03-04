@@ -120,6 +120,26 @@ class MPDPoller(object):
         for song in queue:
             song['time'] = str(datetime.timedelta(seconds=int(e['time'])))
         return queue
+    
+    
+    def get_status(self):
+        try:
+            status = self._client.status()
+        
+        except (MPDError, IOError):
+           
+            self.disconnect()
+            try:
+                self.connect()
+            # Reconnecting failed
+            except PollerError as e:
+                raise PollerError("Reconnecting failed: %s" % e)
+            try:
+                status = self._client.status()
+            # Failed again, just give up
+            except (MPDError, IOError) as e:
+                raise PollerError("Couldn't retrieve playlist: %s" % e)
+        return status
 
     def disconnect(self):
         # Try to tell MPD we're closing the connection first
@@ -223,11 +243,12 @@ def main(request):
 def render_station_overview(request):
 	"""
 
-	gets html for list of stations
+	gets html for the overview of a station
 	and renders it
 
 	"""
 	current_song = ""
+	status = {'state':'error'}
 	stationlist = get_stationlist()
 	admin_port = request.GET['port'].encode('utf-8')
 	for station in stationlist:
@@ -235,18 +256,21 @@ def render_station_overview(request):
 			admin_port = str(station['admin_port'])
 			stream_port = str(station['stream_port'])
 			stream_name = station['stream_name']
-			print ('test')
 	try:
 		poller = MPDPoller(admin_port)
 		poller.connect()
 		current_song = poller.get_current_song()
+		status =  poller.get_status()
 		poller.disconnect()
 	except:
 		current_song = False
+		
 	return render_to_response('stations_stationoverview.html',
 									{'current_song': current_song, 
 									'admin_port':admin_port, 
-									'stream_port':stream_port,'stream_name':stream_name},
+									'stream_port':stream_port,
+									'stream_name':stream_name, 
+									'status': status},
 									context_instance=RequestContext(request))
    
    
