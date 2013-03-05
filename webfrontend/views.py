@@ -247,13 +247,13 @@ def render_station_overview(request):
 	and renders it
 
 	"""
-	current_song = ""
+	current_song = {}
 	status = {'state':'error'}
+	queue = {}
 	stationlist = get_stationlist()
 	admin_port = request.GET['port'].encode('utf-8')
 	for station in stationlist:
 		if admin_port == str(station['admin_port']):
-			admin_port = str(station['admin_port'])
 			stream_port = str(station['stream_port'])
 			stream_name = station['stream_name']
 			#print ('test')
@@ -288,21 +288,34 @@ def render_station_details(request):
 	and renders it
 
 	"""
-	station_port = request.GET['station-port'].encode('utf-8')
-	print("getting songinfo for port: " + station_port)
-	poller = MPDPoller(station_port)
-	poller.connect()
-	current_song = poller.get_current_song()
-	queue = poller.get_queue()
-	poller.disconnect()  
-	current_song['time'] = str(datetime.timedelta(seconds=int(current_song['time'])))[2:]
+	current_song = {}
+	status = {'state':'error'}
+	queue = {}
+	admin_port = request.GET['station-port'].encode('utf-8')
+	try:
+		poller = MPDPoller(admin_port)
+		poller.connect()
+		#current_song = poller.get_current_song()
+		status =  poller.get_status()
+		queue = poller.get_queue()
+		poller.disconnect()
+		for q in queue:
+			if q['id'] == status['songid']:
+				current_song = q
+				break
+	except:
+		current_song = False
+		
+	print current_song
+	
+	#current_song['time'] = str(datetime.timedelta(seconds=int(current_song['time'])))[2:]
 	#artist = lastfm.get_artist("System of a Down")
 	#print artist
 	#print artist.get_cover_image(4)
 	
 	return render_to_response('stations_stationdetails.html',
 							{'current_song': current_song,
-							'station_port':station_port,
+							'station_port':admin_port,
 							'queue':queue},
 							context_instance=RequestContext(request))
     

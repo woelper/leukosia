@@ -189,13 +189,13 @@
 			render_stationdetails(station_port);
 			update_lastfm_songinfo(station_port);
 			update_lastfm_artistinfo(station_port);
-			//alert($('#hidden-title_' + stationlist[i]['admin_port']).val());
+			highlight_current_song(station_port);
 		}
 		
 					
-		//main_interval = setInterval(function() { 		// sets Interval for automatic page updates
-		//		updatePage();
-		//	}, 5000);
+		main_interval = setInterval(function() { 		// sets Interval for automatic page updates
+				updatePage();
+			}, 5000);
 	});
 	
 	
@@ -204,14 +204,9 @@
 			for (i in stationlist) {
 				
 					station_port = stationlist[i]['admin_port'];
-				
 					render_stationoverview(station_port); //renders the station information of current station
 					current_track = $('#hidden-title_' + station_port).val();
-					current_id = $('#hidden-id_' + station_port).val();
-					//$('.playlistrow').attr('class','playlistrow');
-					$('#playlistid_' + current_id).attr('class','success text-error');
 					
-
 
 					//alert(current_id)
 
@@ -219,13 +214,9 @@
 					
 							if ($('#stationdetails_' + station_port).hasClass('in')) {
 								render_stationoverview(station_port); //renders the station information of current station
-								//render_stationdetails(station_port);
 								update_lastfm_songinfo(station_port);
 								update_lastfm_artistinfo(station_port);
-								current_id = $('#hidden-id_' + station_port).val();
-								$('.playlistrow').attr('class','playlistrow');
-								$('#playlistid_' + current_id).attr('class','playlistrow success text-error');
-
+									
 							}
 					}
 					
@@ -260,8 +251,9 @@
 		$.get('/render-station-details/',{'station-port': station_port}).done(function(html){
 			$('#stationdetails_' + station_port).html(html);
 			$('#stationdetails_'+station_port).on('shown', function () {
-				update_lastfm_songinfo(station_port);
-				update_lastfm_artistinfo(station_port);
+			update_lastfm_songinfo(station_port);
+			update_lastfm_artistinfo(station_port);
+			highlight_current_song(station_port);	
 			});
 			
 		});
@@ -275,6 +267,12 @@
 			$('#player1').html(html);
 		});
 	}
+	
+	function highlight_current_song(station_port) {
+			current_id = $('#hidden-id_' + station_port).val(); //current song of playlist
+			$('.playlistrow').attr('class','playlistrow');  //current song of playlist
+			$('#playlistid_' + current_id).attr('class','playlistrow success text-error');  //current song of playlist		
+		}
 	
 	
 	function toggle_audio(host,port) {
