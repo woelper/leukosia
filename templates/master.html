@@ -216,7 +216,7 @@
 								render_stationoverview(station_port); //renders the station information of current station
 								update_lastfm_songinfo(station_port);
 								update_lastfm_artistinfo(station_port);
-									
+								highlight_current_song(station_port);
 							}
 					}
 					
@@ -253,7 +253,7 @@
 			$('#stationdetails_'+station_port).on('shown', function () {
 			update_lastfm_songinfo(station_port);
 			update_lastfm_artistinfo(station_port);
-			highlight_current_song(station_port);	
+				
 			});
 			
 		});
