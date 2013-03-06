@@ -2,14 +2,16 @@ body {
 	padding-top: 70px;
 	padding-bottom: 50px;
 }
+.navbar img {
+position:absolute;
+
+}
 .form-signin {
 	margin:auto;
 	padding:20px;
 	max-width:300px;
 }
 
-.imgcontainer{
-}
 img.lastfm {
 	width:auto;
 }
@@ -18,7 +20,7 @@ img.lastfm {
 	bottom:0px;
 	max-height:400px;
 	overflow:auto;
-	background-color:#fff;
+	background-color:inherit;
 	border:1px solid #eeeeee;
 	-moz-box-shadow:0px 0px 5px 1px #eeeeee;
 	-webkit-box-shadow:0px 0px 5px 1px #eeeeee;

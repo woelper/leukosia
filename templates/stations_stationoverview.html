@@ -2,13 +2,13 @@
     ================================================== -->
 
 <div class="span2">
-		<abbr title="{{ description }}"><strong>{{ stream_name }}</strong></abbr>	
+		<abbr title="{{ description }}"><h3>{{ stream_name }}</h3></abbr>	
 </div>
 
 
 
 
-<div class="span8">
+<div class="span7">
 		<p>
 		{% if status.state == "play" %}
 			<span class="label label-success">playing</span> 
@@ -26,8 +26,13 @@
 			</span>
 		{% endif %}
 </div>
-
-
+<div class="span3">
+		{% if not status.state == "stop" %}
+		<div class="progress">
+				<div class="bar" style="width: {{ status.progress }}%;"></div>
+		</div>
+		{% endif %}
+</div>
 
 
 {% if current_song.artist != "" %}

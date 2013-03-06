@@ -46,7 +46,7 @@ class MPDPoller(object):
         
     def connect(self):
         try:
-            print ("Connecting to " + self._host + ":" + self._port)
+            #print ("Connecting to " + self._host + ":" + self._port)
             self._client.connect(self._host, self._port)
             # Catch socket errors
         except IOError as (errno, strerror):
@@ -270,6 +270,12 @@ def render_station_overview(request):
 				break
 	except:
 		current_song = False
+
+	if status.has_key('time'):
+		z = status['time'].find(":")
+		songelapsed = status['time'][:z]
+		songlength = status['time'][z+1:]
+		status['progress'] = str((int(songelapsed) * 100) / int(songlength))
 	return render_to_response('stations_stationoverview.html',
 						{'current_song': current_song,
 						'queue':queue,
@@ -305,13 +311,12 @@ def render_station_details(request):
 				break
 	except:
 		current_song = False
-		
-	print current_song
 	
 	#current_song['time'] = str(datetime.timedelta(seconds=int(current_song['time'])))[2:]
 	#artist = lastfm.get_artist("System of a Down")
 	#print artist
-	#print artist.get_cover_image(4)
+	#print
+	#artist.get_cover_image(4)
 	
 	return render_to_response('stations_stationdetails.html',
 							{'current_song': current_song,

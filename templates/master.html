@@ -95,7 +95,7 @@
 					<div class="span1">
 					<button id="btn-show-{{ station.admin_port }}" type="button" class="btn btn-mini"
 							
-							data-toggle="collapse" data-target="#stationdetails_{{ station.admin_port }}">
+							data-toggle="collapse" data-target="#stationcollapse_{{ station.admin_port }}">
 							<i class="icon-chevron-down">
 							</i>
 					</button>
@@ -110,9 +110,29 @@
 							</button>
 					</div>
 			</div>
-			<div id="stationdetails_{{ station.admin_port }}" class="row-fluid collapse">
-				.
-			</div> <!-- ** end row fluid **-->
+			<div id="stationcollapse_{{ station.admin_port }}" class="collapse">
+					<br>
+					<div class="well container-fluid">
+							<div class="row-fluid">
+									<div class="btn-toolbar">
+										  <div class="btn-group">
+											<button class="btn">Left</button>
+											<button class="btn">Middle</button>
+											<button class="btn">Right</button>
+											<button class="btn">Middle</button>
+											<button class="btn">Right</button>
+										  </div>
+										  <div class="btn-group">
+											<button class="btn">Left</button>
+											<button class="btn">Middle</button>
+											<button class="btn">Right</button>
+										  </div>
+									</div>
+							</div><!-- ** end row fluid **-->
+							<div id="stationdetails_{{ station.admin_port }}" class="row-fluid">
+							</div> <!-- ** end stationdetails fluid **-->
+					</div>
+			</div> <!-- ** end stationcollapse fluid **-->
 			
 	</div> <!-- *** end fluid container *** -->
 	<hr>		
@@ -120,10 +140,10 @@
 	
 
 	<!-- ## Chat Box ## -->
-	<div id="chat1" class="span4 offset12 chat" style="display:none">
+	<div id="chat1" class="span4 offset8 chat" style="display:none">
 		chat loading...
 	</div> 	<!-- end chat 1 -->
-	<div id="chat2" class="span4 offset12 chat">
+	<div id="chat2" class="span4 offset8 chat">
 			<div class="container-fluid">
 					<a id="togglechat" role="button" class="btn btn-mini pull-right" onclick="$('.chat').toggle(); return false;">
 							<i class="icon-chevron-up"></i> Chat
@@ -133,10 +153,10 @@
 	
 	
 	<!-- ## Player ## -->
-	<div id="player1" class="span6 offset6 player" style="display:none">
+	<div id="player1" class="span6 offset2 player" style="display:none">
 		player loading...
 	</div> 	<!-- end chat 1 -->
-	<div id="player2" class="span6 offset6 player">
+	<div id="player2" class="span6 offset2 player">
 			<div class="container-fluid">
 					<a id="togglechat" role="button" class="btn btn-mini pull-right" onclick="$('.player').toggle(); return false;">
 							<i class="icon-chevron-up"></i> Player
@@ -145,6 +165,8 @@
 	</div> 	<!-- end chat 2-->
 	
 	{% endif %}
+	
+
 				
 
 
@@ -195,7 +217,7 @@
 					
 		main_interval = setInterval(function() { 		// sets Interval for automatic page updates
 				updatePage();
-			}, 5000);
+			},1000);
 	});
 	
 	
@@ -204,15 +226,14 @@
 			for (i in stationlist) {
 				
 					station_port = stationlist[i]['admin_port'];
-					render_stationoverview(station_port); //renders the station information of current station
-					current_track = $('#hidden-title_' + station_port).val();
 					
-
-					//alert(current_id)
-
+					render_stationoverview(station_port); //renders the station information of current station
+					highlight_current_song(station_port);
+					
+					current_track = $('#hidden-title_' + station_port).val();
 					if ((current_track != false) && (current_track != stationlist[i]['last_track'])) { //only update page when track changes
 					
-							if ($('#stationdetails_' + station_port).hasClass('in')) {
+							if ($('#stationcollapse_' + station_port).hasClass('in')) {
 								render_stationoverview(station_port); //renders the station information of current station
 								update_lastfm_songinfo(station_port);
 								update_lastfm_artistinfo(station_port);
@@ -250,7 +271,7 @@
 		last_album = "";
 		$.get('/render-station-details/',{'station-port': station_port}).done(function(html){
 			$('#stationdetails_' + station_port).html(html);
-			$('#stationdetails_'+station_port).on('shown', function () {
+			$('#stationcollapse_'+station_port).on('shown', function () {
 			update_lastfm_songinfo(station_port);
 			update_lastfm_artistinfo(station_port);
 				
@@ -269,10 +290,10 @@
 	}
 	
 	function highlight_current_song(station_port) {
-			current_id = $('#hidden-id_' + station_port).val(); //current song of playlist
-			$('.playlistrow').attr('class','playlistrow');  //current song of playlist
-			$('#playlistid_' + current_id).attr('class','playlistrow success text-error');  //current song of playlist		
-		}
+		current_id = $('#hidden-id_' + station_port).val();
+		//$('.playlistrow').attr('class','playlistrow');  
+		$('#playlistid_' + current_id).attr('class','playlistrow success text-error'); 
+	}
 	
 	
 	function toggle_audio(host,port) {
