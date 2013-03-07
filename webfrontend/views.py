@@ -2,6 +2,7 @@ import time
 import datetime
 import logging
 import urllib, urllib2
+import parser
 
 
 from django.shortcuts import render_to_response
@@ -140,7 +141,16 @@ class MPDPoller(object):
             except (MPDError, IOError) as e:
                 raise PollerError("Couldn't retrieve playlist: %s" % e)
         return status
-
+       
+    def playback_cmd(self, command):
+        print "++++++++ " + command
+        try:
+            exec('self._client.' + command + '()')
+            print "*+++"
+        except (MPDError, IOError):
+           print "MPD COMMAND ERROR"
+	return True
+	
     def disconnect(self):
         # Try to tell MPD we're closing the connection first
         try:
@@ -285,8 +295,7 @@ def render_station_overview(request):
 						'status': status},
 						context_instance=RequestContext(request))
    
-   
-    
+
 def render_station_details(request):
 	"""
 
@@ -381,20 +390,18 @@ def playqueue(request):
     cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
     return render_to_response('playqueue.html',{'playlist':cur_playlist},context_instance=RequestContext(request))
 
-def mpd_get_song(request):
-	port = request.GET['station_port'].encode('utf-8')
-	current_song = ""
+def mpd_cmd(request):
+	port = request.POST['port'].encode('utf-8')
+	command = request.POST['cmd'].encode('utf-8')
+	print command + port
 	try:
 		poller = MPDPoller(port)
 		poller.connect()
-		current_song = poller.get_current_song()
+		poller.playback_cmd(command)
 		poller.disconnect()
 	except:
-		current_song = False
-	if current_song:
-		return HttpResponse(current_song['title'])
-	else:
-		return HttpResponse("")
+		pass
+	return HttpResponse("")
 
 
 def logout_view(request):

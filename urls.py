@@ -30,10 +30,10 @@ urlpatterns = patterns('',
     # urls for posting data to server
     url(r'^post-chat/', 'webfrontend.views.post_chat'),
     
-    #url(r'^stationoverview/', 'webfrontend.views.stationoverview',name='index'),
-    url(r'^playqueue/', 'webfrontend.views.playqueue'),    
-    url(r'^mpd-get-song/', 'webfrontend.views.mpd_get_song'),
+    # urls for mpd commands
+    url(r'^mpd-cmd/', 'webfrontend.views.mpd_cmd'),
     
+    #url(r'^playqueue/', 'webfrontend.views.playqueue'),    
     
     # Uncomment the next line to enable the admin:
     url(r'^admin/', include(admin.site.urls)),
