@@ -143,17 +143,14 @@ class MPDPoller(object):
         return status
        
     def playback_cmd(self, command, args):
-        print "++++++++ " + command
         try:
             if args.has_key('songid'):
-                print 'self._client.' + command + '(' + args['songid'] + ')'
                 exec('self._client.' + command + '(' + args['songid'] + ')')
             else:
-                print "sdascsacsac"
                 exec('self._client.' + command + '()')
         except (MPDError, IOError):
            print "MPD COMMAND ERROR"
-	return True
+        return True
 	
     def disconnect(self):
         # Try to tell MPD we're closing the connection first

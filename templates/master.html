@@ -255,9 +255,8 @@
 			for (i in stationlist) {
 				
 					station_port = stationlist[i]['admin_port'];
-					
 					render_stationoverview(station_port); //renders the station information of current station
-					
+					highlight_current_song(station_port);
 					
 					current_track = $('#hidden-title_' + station_port).val();
 					if ((current_track != false) && (current_track != stationlist[i]['last_track'])) { //only update page when track changes
@@ -266,7 +265,6 @@
 								render_stationoverview(station_port); //renders the station information of current station
 								update_lastfm_songinfo(station_port);
 								update_lastfm_artistinfo(station_port);
-								highlight_current_song(station_port);
 							}
 					}
 					
@@ -323,8 +321,8 @@
 	 *  highlights the currently played song on playqueue
 	 */
 		current_id = $('#hidden-id_' + station_port).val();
-		$('.playlistrow').removeClass('success');  
-		$('#playlistid_' + current_id).addClass('success'); 
+		$('.playlistrow_' + station_port).removeClass('info');  
+		$('#playlistid_' + current_id).addClass('info');
 	}
 	
 	
@@ -339,7 +337,10 @@
 	}
 	
 	function mpd(args) {
-			$.post('/mpd-cmd/', args);
+			$.post('/mpd-cmd/', args)
+			.done(function() {
+				highlight_current_song(args['port']);
+			});
 	}
 	
 	

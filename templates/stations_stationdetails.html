@@ -51,7 +51,7 @@
 						</div> <!-- ** end tab artistinfo ** -->
 						
 						<div class="tab-pane" id="playqueue_{{ station_port }}"> <!-- ** tab playqueue ** -->
-								<table class="table table-condensed table-striped table-hover table-bordered">
+								<table class="table table-condensed table-striped table-bordered">
 										<thead>
 												<tr>			
 														<th></th>
@@ -67,7 +67,7 @@
 										<tbody>
 												{% for a in queue %}
 												
-												<tr class="playlistrow" id='playlistid_{{a.id}}'>
+												<tr class="playlistrow_{{ station_port }}" id='playlistid_{{ a.id }}'>
 														<td class="dropdown">
 																<button class="btn btn-mini dropdown-toggle" data-toggle="dropdown"><i class="icon-chevron-right"></i></button>
 															  
@@ -80,8 +80,6 @@
 																  </ul>
 														</td>
 																								
-														<td>{{a.song}}</td>
-														<td>{{a.id}}</td>
 														<td>{{a.track}}</td>
 														<td>{{a.title}}</td>
 														<td>{{a.artist}}</td>
