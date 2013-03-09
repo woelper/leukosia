@@ -142,11 +142,15 @@ class MPDPoller(object):
                 raise PollerError("Couldn't retrieve playlist: %s" % e)
         return status
        
-    def playback_cmd(self, command):
+    def playback_cmd(self, command, args):
         print "++++++++ " + command
         try:
-            exec('self._client.' + command + '()')
-            print "*+++"
+            if args.has_key('songid'):
+                print 'self._client.' + command + '(' + args['songid'] + ')'
+                exec('self._client.' + command + '(' + args['songid'] + ')')
+            else:
+                print "sdascsacsac"
+                exec('self._client.' + command + '()')
         except (MPDError, IOError):
            print "MPD COMMAND ERROR"
 	return True
@@ -383,21 +387,22 @@ def post_chat(request):
     return HttpResponse()
 
 
-
-### Ajax ###
-
-def playqueue(request):
-    cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
-    return render_to_response('playqueue.html',{'playlist':cur_playlist},context_instance=RequestContext(request))
-
 def mpd_cmd(request):
+	"""
+	
+	executes mpd commands
+    
+    """
+	args = {}
 	port = request.POST['port'].encode('utf-8')
 	command = request.POST['cmd'].encode('utf-8')
-	print command + port
+	if request.POST.has_key('songid'):
+		songid = request.POST['songid'].encode('utf-8')
+		args['songid'] = songid
 	try:
 		poller = MPDPoller(port)
 		poller.connect()
-		poller.playback_cmd(command)
+		poller.playback_cmd(command,args)
 		poller.disconnect()
 	except:
 		pass
@@ -413,5 +418,10 @@ def logout_view(request):
     logout(request)
     return HTTPResponseRedirect('/')('/')
 
+
+
+def playqueue(request):
+    cur_playlist = get_current_playlist(request.GET['station_port'].encode('utf-8'))
+    return render_to_response('playqueue.html',{'playlist':cur_playlist},context_instance=RequestContext(request))
 
 

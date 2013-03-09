@@ -54,6 +54,7 @@
 								<table class="table table-condensed table-striped table-hover table-bordered">
 										<thead>
 												<tr>			
+														<th></th>
 														<th>Track</th>
 														<th>Title</th>
 														<th>Artist</th>
@@ -65,7 +66,22 @@
 										</thead>
 										<tbody>
 												{% for a in queue %}
+												
 												<tr class="playlistrow" id='playlistid_{{a.id}}'>
+														<td class="dropdown">
+																<button class="btn btn-mini dropdown-toggle" data-toggle="dropdown"><i class="icon-chevron-right"></i></button>
+															  
+																  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+																			<li><a tabindex="-1" onclick="mpd({'cmd': 'playid', 'port': '{{ station_port }}', 'songid': '{{ a.id }}'}); return false;" href=""><i class="icon-play"></i> Play Song</a></li>
+																			<li><a tabindex="-1" href="#">Another action</a></li>
+																			<li><a tabindex="-1" href="#">Something else here</a></li>
+																			<li class="divider"></li>
+																			<li><a tabindex="-1" href="#">Separated link</a></li>
+																  </ul>
+														</td>
+																								
+														<td>{{a.song}}</td>
+														<td>{{a.id}}</td>
 														<td>{{a.track}}</td>
 														<td>{{a.title}}</td>
 														<td>{{a.artist}}</td>

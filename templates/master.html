@@ -116,19 +116,19 @@
 							<div class="row-fluid">
 									<div class="btn-toolbar">
 										  <div class="btn-group">
-											<button class="btn" onclick="mpd('previous', '{{ station.admin_port }}')">
+											<button class="btn" onclick="mpd({'cmd': 'previous', 'port': '{{ station.admin_port }}'})">
 													<i class="icon-step-backward"></i>
 											</button>
-											<button class="btn" onclick="mpd('play', '{{ station.admin_port }}')">
+											<button class="btn" onclick="mpd({'cmd': 'play', 'port': '{{ station.admin_port }}'})">
 													<i class="icon-play"></i>
 											</button>
-											<button class="btn" onclick="mpd('pause', '{{ station.admin_port }}')">
+											<button class="btn" onclick="mpd({'cmd': 'pause', 'port': '{{ station.admin_port }}'})">
 													<i class="icon-pause"></i>
 											</button>
-											<button class="btn" onclick="mpd('stop', '{{ station.admin_port }}')">
+											<button class="btn" onclick="mpd({'cmd': 'stop', 'port': '{{ station.admin_port }}'})">
 													<i class="icon-stop"></i>
 											</button>
-											<button class="btn" onclick="mpd('next', '{{ station.admin_port }}')">
+											<button class="btn" onclick="mpd({'cmd': 'next', 'port': '{{ station.admin_port }}'})">
 													<i class="icon-step-forward"></i>
 											</button>
 										  </div>
@@ -150,10 +150,29 @@
 	
 
 	<!-- ## Chat Box ## -->
-	<div id="chat1" class="span4 offset8 chat" style="display:none">
-		chat loading...
+	<div id="chat1" class="span5 offset6 chat" style="display:none">
+			<div class="container-fluid">
+					<small>
+					
+					<a role="button" class="btn btn-mini pull-right" onclick="$('.chat').toggle(); return false;">
+							<i class="icon-chevron-down"></i> Hide
+					</a>
+					<br>
+					<p>
+							<form action="" method="post" onsubmit="post_chat(); return false; "> <!-- chat -->
+									{% csrf_token %}
+									<div class="input-append"> <!-- chat input -->
+										  <input id="chatcontent" name="chatcontent" type="text">
+										  <button id="chatbutton" class="btn" type="submit"><i class="icon-comment"></i></button> 
+									</div> <!-- end chat input -->
+							</form>
+					</p>
+					<div id="content">
+					</div>
+					</small>
+			</div>
 	</div> 	<!-- end chat 1 -->
-	<div id="chat2" class="span4 offset8 chat">
+	<div id="chat2" class="span5 offset6 chat">
 			<div class="container-fluid">
 					<a id="togglechat" role="button" class="btn btn-mini pull-right" onclick="$('.chat').toggle(); return false;">
 							<i class="icon-chevron-up"></i> Chat
@@ -163,10 +182,10 @@
 	
 	
 	<!-- ## Player ## -->
-	<div id="player1" class="span6 offset2 player" style="display:none">
+	<div id="player1" class="span5 offset1 player" style="display:none">
 		player loading...
 	</div> 	<!-- end chat 1 -->
-	<div id="player2" class="span6 offset2 player">
+	<div id="player2" class="span5 offset1 player">
 			<div class="container-fluid">
 					<a id="togglechat" role="button" class="btn btn-mini pull-right" onclick="$('.player').toggle(); return false;">
 							<i class="icon-chevron-up"></i> Player
@@ -221,7 +240,7 @@
 			render_stationdetails(station_port);
 			update_lastfm_songinfo(station_port);
 			update_lastfm_artistinfo(station_port);
-			highlight_current_song(station_port);
+			
 		}
 		
 					
@@ -238,7 +257,7 @@
 					station_port = stationlist[i]['admin_port'];
 					
 					render_stationoverview(station_port); //renders the station information of current station
-					highlight_current_song(station_port);
+					
 					
 					current_track = $('#hidden-title_' + station_port).val();
 					if ((current_track != false) && (current_track != stationlist[i]['last_track'])) { //only update page when track changes
@@ -284,7 +303,7 @@
 			$('#stationcollapse_'+station_port).on('shown', function () {
 			update_lastfm_songinfo(station_port);
 			update_lastfm_artistinfo(station_port);
-				
+			highlight_current_song(station_port);
 			});
 			
 		});
@@ -300,9 +319,12 @@
 	}
 	
 	function highlight_current_song(station_port) {
+	/*
+	 *  highlights the currently played song on playqueue
+	 */
 		current_id = $('#hidden-id_' + station_port).val();
-		//$('.playlistrow').attr('class','playlistrow');  
-		$('#playlistid_' + current_id).attr('class','playlistrow success text-error'); 
+		$('.playlistrow').removeClass('success');  
+		$('#playlistid_' + current_id).addClass('success'); 
 	}
 	
 	
@@ -316,8 +338,8 @@
 		}
 	}
 	
-	function mpd(cmd,port) {
-			$.post('/mpd-cmd/', {'cmd': cmd, 'port': port});
+	function mpd(args) {
+			$.post('/mpd-cmd/', args);
 	}
 	
 	
@@ -326,7 +348,7 @@
 	 *  renders the chat contents
 	 */
 		$.get("/render-chat/").done(function(html) {
-			$('#chat1').html(html);
+			$('#chat1').find('#content').html(html);
 		});
 	}
 		

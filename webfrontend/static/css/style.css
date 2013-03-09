@@ -18,13 +18,13 @@ img.lastfm {
 .chat, .player {
 	position:fixed;
 	bottom:0px;
-	max-height:400px;
+	max-height:50%;
 	overflow:auto;
 	background-color:inherit;
-	border:1px solid #eeeeee;
-	-moz-box-shadow:0px 0px 5px 1px #eeeeee;
-	-webkit-box-shadow:0px 0px 5px 1px #eeeeee;
-	box-shadow:0px 0px 5px 1px #eeeeee;
+	//border:1px solid #eeeeee;
+	//-moz-box-shadow:0px 0px 5px 1px #eeeeee;
+	//-webkit-box-shadow:0px 0px 5px 1px #eeeeee;
+	//box-shadow:0px 0px 5px 1px #eeeeee;
 }
 #chat2 {
 	height:auto;
