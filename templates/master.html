@@ -113,7 +113,7 @@
 					</div>
 					<div class="span1" id="stationoverview_{{ station.admin_port }}">
 					
-							<button class="btn btn-mini" data-toggle="button" onclick="toggle_audio('{{ mpdhost }}', '{{ station.stream_port }}');">
+							<button class="btn btn-mini" data-toggle="button" onclick="toggle_audio('{{ mpdhost }}/{{ username }}', '{{ station.stream_port }}');">
 									<i class="icon-headphones"></i>
 							</button>
 					</div>
@@ -355,11 +355,11 @@
 	
 	
 	function toggle_audio(host,port) {
-		if ($('#audiotag1').attr('src') == 'http://' + host + ":" + port) {
+		if ($('#audiotag1').attr('src') == 'http://' + host) {
 			a.src = "";
 		}
 		else {
-			a.src='http://' + host + ":" + port; 
+			a.src='http://' + host; 
 			a.play();
 		}
 	}
