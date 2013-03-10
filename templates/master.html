@@ -68,6 +68,12 @@
 					</div> <!-- end navbar-inner -->
 			</div> <!-- end navbar-inner -->
 	</div> <!-- end navbar -->
+	<!--<div class="subnav">
+			<ul class="nav nav-pills">
+					<li class="active"><a href="#stationsection_6003">obamah</a></li>
+					
+			</ul>
+	</div>-->
 
 	<div class="visible-phone">Mobile view</div>
 	
@@ -90,7 +96,9 @@
 	
 	<!-- ## Stations ## -->
 	{% for station in stationlist %}
+	<section id="stationsection_{{ station.admin_port }}">
 	<div class="container-fluid">  <!-- *** fluid container *** -->
+			
 			<div class="row-fluid">
 					<div class="span1">
 					<button id="btn-show-{{ station.admin_port }}" type="button" class="btn btn-mini"
@@ -145,6 +153,7 @@
 			</div> <!-- ** end stationcollapse fluid **-->
 			
 	</div> <!-- *** end fluid container *** -->
+	</section>
 	<hr>		
 	{% endfor %}
 	
@@ -240,13 +249,16 @@
 			render_stationdetails(station_port);
 			update_lastfm_songinfo(station_port);
 			update_lastfm_artistinfo(station_port);
+			render_stationdetails_playqueue(station_port);
 			
 		}
 		
 					
-		main_interval = setInterval(function() { 		// sets Interval for automatic page updates
-				updatePage();
-			},2000);
+		//main_interval = setInterval(function() { 		// sets Interval for automatic page updates
+		//		updatePage();
+		//	},2000);
+		
+		
 	});
 	
 	
@@ -307,6 +319,22 @@
 		});
 	}
 	
+	function render_stationdetails_playqueue(station_port) {
+	/* 
+	 *  gets the html for the playqueue of the desired station and renders it
+	 */
+		last_artist = "";
+		last_album = "";
+		$.get('/render-station-details-playqueue/',{'station-port': station_port}).done(function(html){
+			$('#playqueue_' + station_port).html(html);
+			$('#playlistsave_' + station_port).on('click', function() {  // bind the clickhandler for the playlistsave button
+				playlistname = $('#playlistname_' + station_port).val();
+				playlistport =  $('#playlistport_' + station_port).val();
+				mpd({'cmd': 'save', 'port': playlistport, 'id': playlistname});
+			});
+		});
+	}
+	
 	function render_player() {
 	/*
 	 *  renders the chat contents
@@ -322,7 +350,7 @@
 	 */
 		current_id = $('#hidden-id_' + station_port).val();
 		$('.playlistrow_' + station_port).removeClass('info');  
-		$('#playlistid_' + current_id).addClass('info');
+		$('#playlistid_' + station_port + "_" + current_id).addClass('info');
 	}
 	
 	
@@ -340,8 +368,11 @@
 			$.post('/mpd-cmd/', args)
 			.done(function() {
 				highlight_current_song(args['port']);
+				render_stationdetails_playqueue(args['port']);
 			});
 	}
+	
+	
 	
 	
 	function render_chat() {

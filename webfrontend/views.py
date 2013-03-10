@@ -121,7 +121,33 @@ class MPDPoller(object):
         for song in queue:
             song['time'] = str(datetime.timedelta(seconds=int(song['time'])))
         return queue
-    
+        
+    def get_playlists(self):
+        try:
+            playlists = self._client.lsinfo()
+        # Couldn't get the current song, so try reconnecting and retrying
+        except (MPDError, IOError):
+            # No error handling required here
+            # Our disconnect function catches all exceptions, and therefore
+            # should never raise any.
+            self.disconnect()
+            try:
+                self.connect()
+            # Reconnecting failed
+            except PollerError as e:
+                raise PollerError("Reconnecting failed: %s" % e)
+            try:
+                playlists = self._client.lsinfo()
+            # Failed again, just give up
+            except (MPDError, IOError) as e:
+                raise PollerError("Couldn't retrieve playlist: %s" % e)
+        # Hurray!  We got the current queue without any errors!
+        result = []
+        for playlist in playlists:
+			if playlist.has_key('playlist'):
+				playlist['last_modified'] = playlist['last-modified']
+				result.append(playlist)
+        return result
     
     def get_status(self):
         try:
@@ -144,9 +170,11 @@ class MPDPoller(object):
        
     def playback_cmd(self, command, args):
         try:
-            if args.has_key('songid'):
-                exec('self._client.' + command + '(' + args['songid'] + ')')
+            if args.has_key('id'):
+                print 'self._client.' + command + '("' + args['id'] + '")'
+                exec('self._client.' + command + '("' + args['id'] + '")')
             else:
+                print 'self._client.' + command + '()'
                 exec('self._client.' + command + '()')
         except (MPDError, IOError):
            print "MPD COMMAND ERROR"
@@ -307,6 +335,7 @@ def render_station_details(request):
 	current_song = {}
 	status = {'state':'error'}
 	queue = {}
+	playlists = {}
 	admin_port = request.GET['station-port'].encode('utf-8')
 	try:
 		poller = MPDPoller(admin_port)
@@ -314,6 +343,7 @@ def render_station_details(request):
 		#current_song = poller.get_current_song()
 		status =  poller.get_status()
 		queue = poller.get_queue()
+		playlists = poller.get_playlists()
 		poller.disconnect()
 		for q in queue:
 			if q['id'] == status['songid']:
@@ -331,9 +361,30 @@ def render_station_details(request):
 	return render_to_response('stations_stationdetails.html',
 							{'current_song': current_song,
 							'station_port':admin_port,
-							'queue':queue},
+							'queue':queue,
+							'playlists':playlists},
 							context_instance=RequestContext(request))
     
+def render_station_details_playqueue(request):
+	"""
+
+	gets html for playqueue of details of stations
+	and renders it
+
+	"""
+	admin_port = request.GET['station-port'].encode('utf-8')
+	queue = {}
+	try:
+		poller = MPDPoller(admin_port)
+		poller.connect()
+		queue = poller.get_queue()
+		poller.disconnect()
+	except:
+		pass
+	return render_to_response('stations_stationdetails_playqueue.html',
+							{'station_port':admin_port,
+							'queue':queue},
+							context_instance=RequestContext(request))
 
 def render_player(request):
     """
@@ -393,9 +444,9 @@ def mpd_cmd(request):
 	args = {}
 	port = request.POST['port'].encode('utf-8')
 	command = request.POST['cmd'].encode('utf-8')
-	if request.POST.has_key('songid'):
-		songid = request.POST['songid'].encode('utf-8')
-		args['songid'] = songid
+	if request.POST.has_key('id'):
+		songid = request.POST['id'].encode('utf-8')
+		args['id'] = songid
 	try:
 		poller = MPDPoller(port)
 		poller.connect()
