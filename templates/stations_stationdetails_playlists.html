@@ -1,0 +1,23 @@
+<!-- Content of stations_stationdetails_playqueue.html
+    ================================================== -->
+
+
+{% for list in playlists %}
+<p>
+		<div class="dropdown"> 
+				<button class="btn btn-mini dropdown-toggle" data-toggle="dropdown"><i class="icon-chevron-right"></i></button>
+			
+				{{ list.playlist }} 
+				<span class="muted"> ({{ list.last_modified }}) </span>
+			
+				<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+						<li><a tabindex="-1" onclick="mpd({'cmd': 'load', 'port': '{{ station_port }}', 'id': '{{ list.playlist }}'}); return false;" href=""><i class="icon-plus"></i> Add</a></li>
+						<li><a tabindex="-1" onclick="mpd({'cmd': 'clear', 'port': '{{ station_port }}'}); mpd({'cmd': 'load', 'port': '{{ station_port }}', 'id': '{{ list.playlist }}'}); return false;" href=""><i class="icon-share-alt"></i> Replace</a></li>
+						<li><a tabindex="-1" href="#">Something else here</a></li>
+						<li class="divider"></li>
+						<li><a tabindex="-1" onclick="mpd({'cmd': 'clear', 'port': '{{ station_port }}'}); mpd({'cmd': 'rm', 'port': '{{ station_port }}', 'id': '{{ list.playlist }}'}); return false;" href=""><i class="icon-trash"></i> Remove</a></li>
+				</ul>
+		</div>
+</p>
+
+{% endfor %}
