@@ -51,35 +51,29 @@
 						</div> <!-- ** end tab artistinfo ** -->
 						
 						<div class="tab-pane" id="playqueue_{{ station_port }}"> <!-- ** tab playqueue ** -->
-								<table class="table table-condensed table-striped table-hover table-bordered">
-										<thead>
-												<tr>			
-														<th>Track</th>
-														<th>Title</th>
-														<th>Artist</th>
-														<th>Album</th>
-														<th>Date</th>
-														<th>Genre</th>
-														<th>Duration</th>		
-												</tr>		
-										</thead>
-										<tbody>
-												{% for a in queue %}
-												<tr class="playlistrow" id='playlistid_{{a.id}}'>
-														<td>{{a.track}}</td>
-														<td>{{a.title}}</td>
-														<td>{{a.artist}}</td>
-														<td>{{a.album}}</td>
-														<td>{{a.date}}</td>
-														<td>{{a.genre}}</td>
-														<td>{{a.time}}</td>
-												</tr>
-												{% endfor %}
-										</tbody>
-								</table>
+
 						</div> <!-- ** end tab playqueue ** -->
 						
 						<div class="tab-pane" id="playlists_{{ station_port }}"> <!-- ** tab playlists ** -->
+						{% for list in playlists %}
+								<p>
+										<div class="dropdown"> 
+												<button class="btn btn-mini dropdown-toggle" data-toggle="dropdown"><i class="icon-chevron-right"></i></button>
+											
+												{{ list.playlist }} 
+												<span class="muted"> ({{ list.last_modified }}) </span>
+											
+												<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+														<li><a tabindex="-1" onclick="mpd({'cmd': 'load', 'port': '{{ station_port }}', 'id': '{{ list.playlist }}'}); return false;" href=""><i class="icon-plus"></i> Add</a></li>
+														<li><a tabindex="-1" onclick="mpd({'cmd': 'load', 'port': '{{ station_port }}', 'id': '{{ list.playlist }}'}); render_stationdetails_playqueue({{ station_port }}); return false;" href=""><i class="icon-share-alt"></i> Replace</a></li>
+														<li><a tabindex="-1" href="#">Something else here</a></li>
+														<li class="divider"></li>
+														<li><a tabindex="-1" href="#">Separated link</a></li>
+												</ul>
+										</div>
+								</p>
+						
+						{% endfor %}
 						</div> <!-- ** end tab playlist ** -->
 						
 						<div class="tab-pane" id="library_{{ station_port }}">

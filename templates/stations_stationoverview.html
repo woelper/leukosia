@@ -21,9 +21,11 @@
 		{% endif %}
 		{% if current_song %} 
 			{{ current_song.artist }} - {{ current_song.title }}
+			{% if current_song.genre %} 
 			<span class="muted">
 					({{ current_song.genre }})
 			</span>
+			{% endif %}
 		{% endif %}
 </div>
 <div class="span3">

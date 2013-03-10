@@ -7,36 +7,31 @@
 	
 		<div class="hero-unit">
 			
-					<h1 >T U R B O S L O T H</h1>
-					<p>MPD Webradio</p><hr>
-					
-					<img src="{{STATIC_URL}}img/logo_large.png">
-					{% if error %}
-					<div class="alert alert-error">
-							<button type="button" class="close" data-dismiss="alert">&times;</button>
-							<strong>Error: </strong>{{error}}
-					</div>
-					{% endif %}
-					
-					
-					<form class="form-signin pull-left" name="login" method="POST" action="/">
-					{% csrf_token %}
-					<h3 class="form-signin-heading"></h3>
-					<input name="username" type="text" class="input input-xlarge" placeholder="Username"><br>
-					<input name="password" type="password" class="input input-xlarge" placeholder="Password">
-					<label class="checkbox">
-					  <input type="checkbox" value="remember-me">Remember me
-					</label>
-				<button class="btn btn-primary" type="submit">Sign in</button>
+				<h1 >T U R B O S L O T H</h1>
+				<p>MPD Webradio</p><hr>
+				
+				<img src="{{STATIC_URL}}img/logo_large.png">
+				{% if error %}
+				<div class="alert alert-error">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+						<strong>Error: </strong>{{error}}
+				</div>
+				{% endif %}
+				
+				
+		<form class="form-signin pull-left" name="login" method="POST" action="/">
+				{% csrf_token %}
+				<h3 class="form-signin-heading"></h3>
+				<input name="username" type="text" class="input input-xlarge" placeholder="Username"><br>
+				<input name="password" type="password" class="input input-xlarge" placeholder="Password">
+				<label class="checkbox">
+				  <input type="checkbox" value="remember-me">Remember me
+				</label>
+			<button class="btn btn-primary" type="submit">Sign in</button>
 		</form>
 		<div style="clear:both"></div>
-					
+				
 		</div> <!-- /hero-unit -->
 		
-		
-
-
-		
-
 </div>
 {% endblock %}

@@ -68,6 +68,12 @@
 					</div> <!-- end navbar-inner -->
 			</div> <!-- end navbar-inner -->
 	</div> <!-- end navbar -->
+	<!--<div class="subnav">
+			<ul class="nav nav-pills">
+					<li class="active"><a href="#stationsection_6003">obamah</a></li>
+					
+			</ul>
+	</div>-->
 
 	<div class="visible-phone">Mobile view</div>
 	
@@ -90,7 +96,9 @@
 	
 	<!-- ## Stations ## -->
 	{% for station in stationlist %}
+	<section id="stationsection_{{ station.admin_port }}">
 	<div class="container-fluid">  <!-- *** fluid container *** -->
+			
 			<div class="row-fluid">
 					<div class="span1">
 					<button id="btn-show-{{ station.admin_port }}" type="button" class="btn btn-mini"
@@ -116,19 +124,19 @@
 							<div class="row-fluid">
 									<div class="btn-toolbar">
 										  <div class="btn-group">
-											<button class="btn" onclick="mpd('previous', '{{ station.admin_port }}')">
+											<button class="btn" onclick="mpd({'cmd': 'previous', 'port': '{{ station.admin_port }}'})">
 													<i class="icon-step-backward"></i>
 											</button>
-											<button class="btn" onclick="mpd('play', '{{ station.admin_port }}')">
+											<button class="btn" onclick="mpd({'cmd': 'play', 'port': '{{ station.admin_port }}'})">
 													<i class="icon-play"></i>
 											</button>
-											<button class="btn" onclick="mpd('pause', '{{ station.admin_port }}')">
+											<button class="btn" onclick="mpd({'cmd': 'pause', 'port': '{{ station.admin_port }}'})">
 													<i class="icon-pause"></i>
 											</button>
-											<button class="btn" onclick="mpd('stop', '{{ station.admin_port }}')">
+											<button class="btn" onclick="mpd({'cmd': 'stop', 'port': '{{ station.admin_port }}'})">
 													<i class="icon-stop"></i>
 											</button>
-											<button class="btn" onclick="mpd('next', '{{ station.admin_port }}')">
+											<button class="btn" onclick="mpd({'cmd': 'next', 'port': '{{ station.admin_port }}'})">
 													<i class="icon-step-forward"></i>
 											</button>
 										  </div>
@@ -145,15 +153,35 @@
 			</div> <!-- ** end stationcollapse fluid **-->
 			
 	</div> <!-- *** end fluid container *** -->
+	</section>
 	<hr>		
 	{% endfor %}
 	
 
 	<!-- ## Chat Box ## -->
-	<div id="chat1" class="span4 offset8 chat" style="display:none">
-		chat loading...
+	<div id="chat1" class="span5 offset6 chat" style="display:none">
+			<div class="container-fluid">
+					<small>
+					
+					<a role="button" class="btn btn-mini pull-right" onclick="$('.chat').toggle(); return false;">
+							<i class="icon-chevron-down"></i> Hide
+					</a>
+					<br>
+					<p>
+							<form action="" method="post" onsubmit="post_chat(); return false; "> <!-- chat -->
+									{% csrf_token %}
+									<div class="input-append"> <!-- chat input -->
+										  <input id="chatcontent" name="chatcontent" type="text">
+										  <button id="chatbutton" class="btn" type="submit"><i class="icon-comment"></i></button> 
+									</div> <!-- end chat input -->
+							</form>
+					</p>
+					<div id="content">
+					</div>
+					</small>
+			</div>
 	</div> 	<!-- end chat 1 -->
-	<div id="chat2" class="span4 offset8 chat">
+	<div id="chat2" class="span5 offset6 chat">
 			<div class="container-fluid">
 					<a id="togglechat" role="button" class="btn btn-mini pull-right" onclick="$('.chat').toggle(); return false;">
 							<i class="icon-chevron-up"></i> Chat
@@ -163,10 +191,10 @@
 	
 	
 	<!-- ## Player ## -->
-	<div id="player1" class="span6 offset2 player" style="display:none">
+	<div id="player1" class="span5 offset1 player" style="display:none">
 		player loading...
 	</div> 	<!-- end chat 1 -->
-	<div id="player2" class="span6 offset2 player">
+	<div id="player2" class="span5 offset1 player">
 			<div class="container-fluid">
 					<a id="togglechat" role="button" class="btn btn-mini pull-right" onclick="$('.player').toggle(); return false;">
 							<i class="icon-chevron-up"></i> Player
@@ -221,13 +249,16 @@
 			render_stationdetails(station_port);
 			update_lastfm_songinfo(station_port);
 			update_lastfm_artistinfo(station_port);
-			highlight_current_song(station_port);
+			render_stationdetails_playqueue(station_port);
+			
 		}
 		
 					
-		main_interval = setInterval(function() { 		// sets Interval for automatic page updates
-				updatePage();
-			},2000);
+		//main_interval = setInterval(function() { 		// sets Interval for automatic page updates
+		//		updatePage();
+		//	},2000);
+		
+		
 	});
 	
 	
@@ -236,7 +267,6 @@
 			for (i in stationlist) {
 				
 					station_port = stationlist[i]['admin_port'];
-					
 					render_stationoverview(station_port); //renders the station information of current station
 					highlight_current_song(station_port);
 					
@@ -247,7 +277,6 @@
 								render_stationoverview(station_port); //renders the station information of current station
 								update_lastfm_songinfo(station_port);
 								update_lastfm_artistinfo(station_port);
-								highlight_current_song(station_port);
 							}
 					}
 					
@@ -284,9 +313,25 @@
 			$('#stationcollapse_'+station_port).on('shown', function () {
 			update_lastfm_songinfo(station_port);
 			update_lastfm_artistinfo(station_port);
-				
+			highlight_current_song(station_port);
 			});
 			
+		});
+	}
+	
+	function render_stationdetails_playqueue(station_port) {
+	/* 
+	 *  gets the html for the playqueue of the desired station and renders it
+	 */
+		last_artist = "";
+		last_album = "";
+		$.get('/render-station-details-playqueue/',{'station-port': station_port}).done(function(html){
+			$('#playqueue_' + station_port).html(html);
+			$('#playlistsave_' + station_port).on('click', function() {  // bind the clickhandler for the playlistsave button
+				playlistname = $('#playlistname_' + station_port).val();
+				playlistport =  $('#playlistport_' + station_port).val();
+				mpd({'cmd': 'save', 'port': playlistport, 'id': playlistname});
+			});
 		});
 	}
 	
@@ -300,9 +345,12 @@
 	}
 	
 	function highlight_current_song(station_port) {
+	/*
+	 *  highlights the currently played song on playqueue
+	 */
 		current_id = $('#hidden-id_' + station_port).val();
-		//$('.playlistrow').attr('class','playlistrow');  
-		$('#playlistid_' + current_id).attr('class','playlistrow success text-error'); 
+		$('.playlistrow_' + station_port).removeClass('info');  
+		$('#playlistid_' + station_port + "_" + current_id).addClass('info');
 	}
 	
 	
@@ -316,9 +364,15 @@
 		}
 	}
 	
-	function mpd(cmd,port) {
-			$.post('/mpd-cmd/', {'cmd': cmd, 'port': port});
+	function mpd(args) {
+			$.post('/mpd-cmd/', args)
+			.done(function() {
+				highlight_current_song(args['port']);
+				render_stationdetails_playqueue(args['port']);
+			});
 	}
+	
+	
 	
 	
 	function render_chat() {
@@ -326,7 +380,7 @@
 	 *  renders the chat contents
 	 */
 		$.get("/render-chat/").done(function(html) {
-			$('#chat1').html(html);
+			$('#chat1').find('#content').html(html);
 		});
 	}
 		
