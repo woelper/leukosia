@@ -28,10 +28,15 @@
 			{% endif %}
 		{% endif %}
 </div>
-<div class="span3">
+
 		{% if not status.state == "stop" %}
-		<div class="progress">
-				<div class="bar" style="width: {{ status.progress }}%;"></div>
+		<div class="span1">
+				 {{ status.time }}
+		</div>
+		<div class="span2">
+				<div class="progress">
+						<div class="bar" style="width: {{ status.progress }}%;"></div>
+				</div>
 		</div>
 		{% endif %}
 </div>

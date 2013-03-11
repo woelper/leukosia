@@ -15,6 +15,7 @@ class Stations(models.Model):
     stream_port = models.IntegerField()
     stream_name = models.CharField(max_length=200)
     description = models.CharField(max_length=200)
+    stream_url = models.CharField(max_length=200)
 
     class Meta:
         ordering = ["admin_port"]

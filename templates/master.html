@@ -37,8 +37,11 @@
 								{% if page != "login" %}
 								
 								
-								
+								 
 								<ul class="nav pull-right">
+									<li><a href="#">Player</a></li>
+									<li><a href="#" id="chat" data-toggle="popover" data-placement="bottom" >Chat</a></li>
+										
 										<li class="dropdown">
 								    			<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 													      <i class="icon-user"></i> {{ username }}
@@ -112,10 +115,11 @@
 					<div class="span10" id="stationoverview_{{ station.admin_port }}">
 					</div>
 					<div class="span1" id="stationoverview_{{ station.admin_port }}">
-					
-							<button class="btn btn-mini" data-toggle="button" onclick="toggle_audio('{{ mpdhost }}/{{ username }}', '{{ station.stream_port }}');">
+							{% for url in station.stream_url %}
+							<button class="btn btn-mini" data-toggle="button" title="{{ url }}" onclick="toggle_audio('{{ url }}');">
 									<i class="icon-headphones"></i>
 							</button>
+							{% endfor %}
 					</div>
 			</div>
 			<div id="stationcollapse_{{ station.admin_port }}" class="collapse">
@@ -247,10 +251,6 @@
 			stationlist[i]['last_track'] = "#####";
 			render_stationoverview(station_port);
 			render_stationdetails(station_port);
-			update_lastfm_songinfo(station_port);
-			update_lastfm_artistinfo(station_port);
-			render_stationdetails_playqueue(station_port);
-			render_stationdetails_playlists(station_port);
 		}
 		
 					
@@ -274,7 +274,6 @@
 					if ((current_track != false) && (current_track != stationlist[i]['last_track'])) { //only update page when track changes
 					
 							if ($('#stationcollapse_' + station_port).hasClass('in')) {
-								render_stationoverview(station_port); //renders the station information of current station
 								update_lastfm_songinfo(station_port);
 								update_lastfm_artistinfo(station_port);
 							}
@@ -311,9 +310,11 @@
 		$.get('/render-station-details/',{'station-port': station_port}).done(function(html){
 			$('#stationdetails_' + station_port).html(html);
 			$('#stationcollapse_'+station_port).on('shown', function () {
-			update_lastfm_songinfo(station_port);
-			update_lastfm_artistinfo(station_port);
-			highlight_current_song(station_port);
+				update_lastfm_songinfo(station_port);
+				update_lastfm_artistinfo(station_port);
+				highlight_current_song(station_port);
+				render_stationdetails_playqueue(station_port);
+				render_stationdetails_playlists(station_port);
 			});
 			
 		});
@@ -363,12 +364,12 @@
 	}
 	
 	
-	function toggle_audio(host,port) {
-		if ($('#audiotag1').attr('src') == 'http://' + host) {
+	function toggle_audio(url) {
+		if ($('#audiotag1').attr('src') == 'http://' + url) {
 			a.src = "";
 		}
 		else {
-			a.src='http://' + host; 
+			a.src='http://' + url; 
 			a.play();
 		}
 	}
@@ -391,6 +392,8 @@
 	 */
 		$.get("/render-chat/").done(function(html) {
 			$('#chat1').find('#content').html(html);
+			$('#chat').popover({'content': html, 'html': true});
+			
 		});
 	}
 		
