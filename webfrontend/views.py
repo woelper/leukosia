@@ -273,6 +273,9 @@ def main(request):
 								{'error': error,'page': "login"},
 								context_instance=RequestContext(request))
 	username = request.user.username
+	for station in stationlist:
+		station['stream_url'] = station['stream_url'].split(",")
+		print str(station['stream_url'])
 	return render_to_response('master.html',
 							{'lastfm_key': LASTFM_API_KEY, 'lastfm_url': LASTFM_API_URL,
 							'username': username, 'stationlist':stationlist, 'mpdhost': HOST},
@@ -315,6 +318,9 @@ def render_station_overview(request):
 		songelapsed = status['time'][:z]
 		songlength = status['time'][z+1:]
 		status['progress'] = str((int(songelapsed) * 100) / int(songlength))
+		songelapsed = str(int(songelapsed))
+		songlength = str(int(songlength))
+		status['time'] = songelapsed + " / " + songlength
 	return render_to_response('stations_stationoverview.html',
 						{'current_song': current_song,
 						'queue':queue,
@@ -343,7 +349,6 @@ def render_station_details(request):
 		#current_song = poller.get_current_song()
 		status =  poller.get_status()
 		queue = poller.get_queue()
-		playlists = poller.get_playlists()
 		poller.disconnect()
 		for q in queue:
 			if q['id'] == status['songid']:
@@ -361,8 +366,7 @@ def render_station_details(request):
 	return render_to_response('stations_stationdetails.html',
 							{'current_song': current_song,
 							'station_port':admin_port,
-							'queue':queue,
-							'playlists':playlists},
+							'queue':queue},
 							context_instance=RequestContext(request))
     
 def render_station_details_playqueue(request):
@@ -384,6 +388,27 @@ def render_station_details_playqueue(request):
 	return render_to_response('stations_stationdetails_playqueue.html',
 							{'station_port':admin_port,
 							'queue':queue},
+							context_instance=RequestContext(request))
+							
+def render_station_details_playlists(request):
+	"""
+
+	gets html for playqueue of details of stations
+	and renders it
+
+	"""
+	admin_port = request.GET['station-port'].encode('utf-8')
+	playlists = {}
+	try:
+		poller = MPDPoller(admin_port)
+		poller.connect()
+		playlists = poller.get_playlists()
+		poller.disconnect()
+	except:
+		pass
+	return render_to_response('stations_stationdetails_playlists.html',
+							{'station_port':admin_port,
+							'playlists':playlists},
 							context_instance=RequestContext(request))
 
 def render_player(request):

@@ -25,6 +25,7 @@ urlpatterns = patterns('',
     url(r'^render-station-overview/', 'webfrontend.views.render_station_overview'),
     url(r'^render-station-details/', 'webfrontend.views.render_station_details'),
     url(r'^render-station-details-playqueue/', 'webfrontend.views.render_station_details_playqueue'),
+    url(r'^render-station-details-playlists/', 'webfrontend.views.render_station_details_playlists'),
     url(r'^render-player/', 'webfrontend.views.render_player'),
     url(r'^render-chat/', 'webfrontend.views.render_chat'),
     
