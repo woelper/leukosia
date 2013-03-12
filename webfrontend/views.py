@@ -148,6 +148,28 @@ class MPDPoller(object):
 				playlist['last_modified'] = playlist['last-modified']
 				result.append(playlist)
         return result
+        
+    def get_library(self):
+        try:
+            library = self._client.list('artist')
+        # Couldn't get the current song, so try reconnecting and retrying
+        except (MPDError, IOError):
+            # No error handling required here
+            # Our disconnect function catches all exceptions, and therefore
+            # should never raise any.
+            self.disconnect()
+            try:
+                self.connect()
+            # Reconnecting failed
+            except PollerError as e:
+                raise PollerError("Reconnecting failed: %s" % e)
+            try:
+                library = self._client.list('artist')
+            # Failed again, just give up
+            except (MPDError, IOError) as e:
+                raise PollerError("Couldn't retrieve playlist: %s" % e)
+        # Hurray!  We got the current lib without any errors!
+        return library
     
     def get_status(self):
         try:
@@ -409,6 +431,28 @@ def render_station_details_playlists(request):
 	return render_to_response('stations_stationdetails_playlists.html',
 							{'station_port':admin_port,
 							'playlists':playlists},
+							context_instance=RequestContext(request))
+							
+def render_station_details_library(request):
+	"""
+
+	gets html for playqueue of details of stations
+	and renders it
+
+	"""
+	admin_port = request.GET['station-port'].encode('utf-8')
+	library = {}
+	try:
+		poller = MPDPoller(admin_port)
+		poller.connect()
+		library = poller.get_library()
+		poller.disconnect()
+	except:
+		print 'except'
+		pass
+	return render_to_response('stations_stationdetails_library.html',
+							{'station_port':admin_port,
+							'library':library},
 							context_instance=RequestContext(request))
 
 def render_player(request):
