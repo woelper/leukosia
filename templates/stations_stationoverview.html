@@ -30,10 +30,10 @@
 </div>
 
 		{% if not status.state == "stop" %}
-		<div class="span1">
+		<div class="span1 hidden-phone">
 				 {{ status.time }}
 		</div>
-		<div class="span2">
+		<div class="span2 hidden-phone">
 				<div class="progress">
 						<div class="bar" style="width: {{ status.progress }}%;"></div>
 				</div>

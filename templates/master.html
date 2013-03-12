@@ -31,7 +31,8 @@
 					<div class="container-fluid">
 						
 								<div class="pull-left">
-									<img src="{{STATIC_URL}}img/logo.png">
+									<div class="hidden-phone"><img src="{{STATIC_URL}}img/logo.png"></div>
+									<div class="visible-phone"><h5>TSmobile</h></div>
 								</div>
 								<!-- <a class="brand" href="#">leuko fm</a> -->
 								{% if page != "login" %}
@@ -78,8 +79,6 @@
 			</ul>
 	</div>-->
 
-	<div class="visible-phone">Mobile view</div>
-	
 	<!-- Content
     ================================================== -->
 	{% endif %}
@@ -110,17 +109,26 @@
 							<i class="icon-chevron-down">
 							</i>
 					</button>
+
+						 {% for url in station.stream_url %}
+                                                        <button class="btn btn-mini " data-toggle="button" title="{{ url }}" onclick="toggle_audio('{{ url }}');">
+                                                                        <i class="icon-headphones"></i>
+                                                        </button>
+                                                        {% endfor %}
+
 					</div>
 					
 					<div class="span10" id="stationoverview_{{ station.admin_port }}">
 					</div>
+					<!--
 					<div class="span1" id="stationoverview_{{ station.admin_port }}">
 							{% for url in station.stream_url %}
-							<button class="btn btn-mini" data-toggle="button" title="{{ url }}" onclick="toggle_audio('{{ url }}');">
+							<button class="btn btn-mini hidden-phone" data-toggle="button" title="{{ url }}" onclick="toggle_audio('{{ url }}');">
 									<i class="icon-headphones"></i>
 							</button>
 							{% endfor %}
 					</div>
+					-->
 			</div>
 			<div id="stationcollapse_{{ station.admin_port }}" class="collapse">
 					<br>
