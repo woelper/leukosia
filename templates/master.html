@@ -249,9 +249,9 @@
 		for (i in stationlist) { 		// inital page rendering
 			station_port = stationlist[i]['admin_port'];
 			stationlist[i]['last_track'] = "#####";
-			render_stationoverview(station_port);
+			//render_stationoverview(station_port);
 			render_stationdetails(station_port);
-			render_stationdetails_library(station_port);
+			//render_stationdetails_library();
 		}
 		
 					
@@ -280,7 +280,6 @@
 								update_lastfm_artistinfo(station_port);
 							}
 					}
-					
 					stationlist[i]['last_track'] = current_track;
 					
 					render_chat();
@@ -311,13 +310,13 @@
 		last_album = "";
 		$.get('/render-station-details/',{'station-port': station_port}).done(function(html){
 			$('#stationdetails_' + station_port).html(html);
+			render_stationdetails_library(station_port);
+			render_stationdetails_playqueue(station_port);
+			render_stationdetails_playlists(station_port);
+			highlight_current_song(station_port);
 			$('#stationcollapse_'+station_port).on('shown', function () {
-				update_lastfm_songinfo(station_port);
-				update_lastfm_artistinfo(station_port);
-				highlight_current_song(station_port);
-				render_stationdetails_playqueue(station_port);
-				render_stationdetails_playlists(station_port);
-				render_stationdetails_library(station_port);
+					update_lastfm_songinfo(station_port);
+					update_lastfm_artistinfo(station_port);
 			});
 			
 		});
@@ -334,6 +333,8 @@
 				playlistport =  $('#playlistport_' + station_port).val();
 				mpd({'cmd': 'save', 'port': playlistport, 'id': playlistname});
 				render_stationdetails_playlists(station_port);
+				//render_stationdetails_library(station_port);
+				
 			});
 		});
 	}
@@ -342,16 +343,18 @@
 	/* 
 	 *  gets the html for the playqueue of the desired station and renders it
 	 */
-
 		$.get('/render-station-details-playlists/',{'station-port': station_port}).done(function(html){
 			$('#playlists_' + station_port).html(html);
 		});
 	}
 	
 	function render_stationdetails_library(station_port) {
-		$.get('/render-station-details-library/',{'station-port': station_port}).done(function(html){
-			$('#library_' + station_port).html(html);
+		$.get('/render-station-details-library-artist/',{'station-port': station_port}).done(function(html){
+			$('#artistview_' + station_port).html(html);
 			});
+		//$.get('/render-station-details-library-folder/',{'station-port': station_port}).done(function(html){
+		//	$('#folderview_' + station_port).html(html);
+		//	});
 		}
 	
 	function render_player() {

@@ -193,10 +193,10 @@ class MPDPoller(object):
     def playback_cmd(self, command, args):
         try:
             if args.has_key('id'):
-                print 'self._client.' + command + '("' + args['id'] + '")'
+               
                 exec('self._client.' + command + '("' + args['id'] + '")')
             else:
-                print 'self._client.' + command + '()'
+                
                 exec('self._client.' + command + '()')
         except (MPDError, IOError):
            print "MPD COMMAND ERROR"
@@ -297,7 +297,6 @@ def main(request):
 	username = request.user.username
 	for station in stationlist:
 		station['stream_url'] = station['stream_url'].split(",")
-		print str(station['stream_url'])
 	return render_to_response('master.html',
 							{'lastfm_key': LASTFM_API_KEY, 'lastfm_url': LASTFM_API_URL,
 							'username': username, 'stationlist':stationlist, 'mpdhost': HOST},
@@ -432,8 +431,9 @@ def render_station_details_playlists(request):
 							{'station_port':admin_port,
 							'playlists':playlists},
 							context_instance=RequestContext(request))
+						
 							
-def render_station_details_library(request):
+def render_station_details_library_artist(request):
 	"""
 
 	gets html for playqueue of details of stations
@@ -448,9 +448,9 @@ def render_station_details_library(request):
 		library = poller.get_library()
 		poller.disconnect()
 	except:
-		print 'except'
 		pass
-	return render_to_response('stations_stationdetails_library.html',
+	library.sort()
+	return render_to_response('stations_stationdetails_library_artist.html',
 							{'station_port':admin_port,
 							'library':library},
 							context_instance=RequestContext(request))

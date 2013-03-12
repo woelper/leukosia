@@ -9,13 +9,24 @@
 					  <li><a href="#artistinfo_{{ station_port }}" data-toggle="tab">Artistinfo</a></li>
 					  <li><a href="#playqueue_{{ station_port }}" data-toggle="tab">Play Queue</a></li>
 					  <li><a href="#playlists_{{ station_port }}" data-toggle="tab">Playlists</a></li>
-					  <li><a href="#library_{{ station_port }}" data-toggle="tab">Library</a></li>
+					  <li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Library <b class="caret"></b></a>
+							
+							<ul class="dropdown-menu">
+									<li class>
+											<a href="#artistview_{{ station_port }}" data-toggle="tab">Artist View</a>
+									</li>
+									<li class>
+											<a href="#folderview_{{ station_port }}" data-toggle="tab">Folder View</a>
+									</li>
+							</ul>
+					</li>
 					  <li><a href="#tab6_{{ station_port }}" data-toggle="tab">...</a></li>
 				</ul>
 			
 				<div class="tab-content row-fluid">
 				
-						<div class="tab-pane active" id="nowplaying_{{ station_port }}"> <!-- ** tab nowplaying ** -->
+						<div class="tab-pane fade active in" id="nowplaying_{{ station_port }}"> <!-- ** tab nowplaying ** -->
 
 								<img class="img-polaroid pull-left span2" src="http://cdn.last.fm/flatness/responsive/2/noimage/default_artist_140_g2.png" />
 
@@ -37,8 +48,8 @@
 										
 								
 						</div> <!-- ** end tab nowplaying ** -->
-						
-						<div class="tab-pane" id="artistinfo_{{ station_port }}"> <!-- ** end tab artistinfo ** -->
+
+						<div class="tab-pane fade" id="artistinfo_{{ station_port }}"> <!-- ** end tab artistinfo ** -->
 
 								<img class="img-rounded pull-left span3" src="http://cdn.last.fm/flatness/responsive/2/noimage/default_artist_140_g2.png" />
 								<div class="span9">
@@ -50,20 +61,23 @@
 								
 						</div> <!-- ** end tab artistinfo ** -->
 						
-						<div class="tab-pane" id="playqueue_{{ station_port }}"> <!-- ** tab playqueue ** -->
+						<div class="tab-pane fade" id="playqueue_{{ station_port }}"> <!-- ** tab playqueue ** -->
 
 						</div> <!-- ** end tab playqueue ** -->
 						
-						<div class="tab-pane" id="playlists_{{ station_port }}"> <!-- ** tab playlists ** -->
+						<div class="tab-pane fade" id="playlists_{{ station_port }}"> <!-- ** tab playlists ** -->
 						
 						</div> <!-- ** end tab playlist ** -->
 						
-						<div class="tab-pane" id="library_{{ station_port }}">
-								<div id="artistinfo">
-								</div>
+						<div class="tab-pane fade" id="artistview_{{ station_port }}">
+loading...
 						</div>
-						
-						<div class="tab-pane" id="tab6">
+
+						<div class="tab-pane fade" id="folderview_{{ station_port }}">
+loading...
+						</div>
+												
+						<div class="tab-pane fade" id="tab6">
 							<div id="artistinfo">
 							</div>
 						</div>
