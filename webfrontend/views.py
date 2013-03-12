@@ -316,9 +316,11 @@ def render_station_overview(request):
 	stationlist = get_stationlist()
 	admin_port = request.GET['port'].encode('utf-8')
 	for station in stationlist:
+		print station
 		if admin_port == str(station['admin_port']):
 			stream_port = str(station['stream_port'])
 			stream_name = station['stream_name']
+			stream_description = station['description']
 			#print ('test')
 	try:
 		poller = MPDPoller(admin_port)
@@ -348,6 +350,7 @@ def render_station_overview(request):
 						'admin_port':admin_port,
 						'stream_port':stream_port,
 						'stream_name':stream_name, 
+						'stream_description':stream_description, 
 						'status': status},
 						context_instance=RequestContext(request))
    

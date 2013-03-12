@@ -103,18 +103,18 @@
 			
 			<div class="row-fluid">
 					<div class="span1">
-					<button id="btn-show-{{ station.admin_port }}" type="button" class="btn btn-mini"
+					<!--<button id="btn-show-{{ station.admin_port }}" type="button" class="btn btn-mini"
 							
 							data-toggle="collapse" data-target="#stationcollapse_{{ station.admin_port }}">
 							<i class="icon-chevron-down">
 							</i>
-					</button>
+					</button>-->
 
-						 {% for url in station.stream_url %}
-                                                        <button class="btn btn-mini " data-toggle="button" title="{{ url }}" onclick="toggle_audio('{{ url }}');">
-                                                                        <i class="icon-headphones"></i>
-                                                        </button>
-                                                        {% endfor %}
+					 {% for url in station.stream_url %}
+					<button class="btn btn-mini " data-toggle="button" title="{{ url }}" onclick="toggle_audio('{{ url }}');">
+									<i class="icon-headphones"></i>
+					</button>
+					{% endfor %}
 
 					</div>
 					
