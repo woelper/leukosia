@@ -27,9 +27,11 @@ urlpatterns = patterns('',
     url(r'^render-station-details-playqueue/', 'webfrontend.views.render_station_details_playqueue'),
     url(r'^render-station-details-playlists/', 'webfrontend.views.render_station_details_playlists'),
     url(r'^render-station-details-library-artist/', 'webfrontend.views.render_station_details_library_artist'),
+    url(r'^render-station-details-library-album/', 'webfrontend.views.render_station_details_library_album'),
     url(r'^render-station-details-library-folder/', 'webfrontend.views.render_station_details_library_folder'),
     url(r'^render-player/', 'webfrontend.views.render_player'),
     url(r'^render-chat/', 'webfrontend.views.render_chat'),
+    url(r'^save-settings/', 'webfrontend.views.save_settings'),
     
     # urls for posting data to server
     url(r'^post-chat/', 'webfrontend.views.post_chat'),

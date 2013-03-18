@@ -1,0 +1,22 @@
+<!-- Content of stations_stationdetails_lib_artistview.html
+    ================================================== -->
+
+
+<div class="container-fluid">
+{% for album in albums %}
+
+<div class="row-fluid"> 
+
+	<div class="span2">
+		<img src="http://cdn.last.fm/flatness/responsive/2/noimage/default_artist_140_g2.png" alt="">
+     </div>
+     <div class="span10">
+			<strong>{{ album }}</strong>
+     </div>
+
+</div>
+<hr>
+
+{% endfor %}
+
+</div>

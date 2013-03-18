@@ -40,8 +40,10 @@
 								
 								 
 								<ul class="nav pull-right">
-									<li><a href="#">Player</a></li>
-									<li><a href="#" id="chat" data-toggle="popover" data-placement="bottom" >Chat</a></li>
+									
+									<li><a href="#" onclick="$('#player').toggle(); return false;">Player</a></li>
+									<li><a href="#" onclick="$('#chat').toggle(); return false;">Chat</a></li>
+									<!--<li><a href="#" >Chat</a></li>-->
 										
 										<li class="dropdown">
 								    			<a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -50,9 +52,24 @@
 								   	 			</a>
 								    			<ul class="dropdown-menu">
 								      					 <li>
-								      					 		<a tabindex="-1" href="#">
+								      					 		<a tabindex="-1" href="#settings" data-toggle="modal">
 								      					 				<i class="icon-wrench"></i> Settings
 								      					 		</a>
+								      					 		<!-- Modal Settings -->
+																<div id="settings" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+																  <div class="modal-header">
+																	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+																	<h3 id="myModalLabel">Settings</h3>
+																  </div>
+																  <div class="modal-body">
+																	<input id="set-username" type="text" class="input input-xlarge" placeholder="Enter a username"><br>
+																																			
+																  </div>
+																  <div class="modal-footer">
+																	<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+																	<button id="save-settings" data-dismiss="modal" class="btn btn-primary">Save</button>
+																  </div>
+																</div>
 								      					 </li>
 														  <li class="divider"></li>
 														  <li>
@@ -67,6 +84,7 @@
 								
 								<!-- HTML5 Audio Tag -->
 								<audio id="audiotag1" src=""></audio>
+								<input type="hidden" id="hidden-song-playing" value=""></input>
 								
 								{% endif%}
 					</div> <!-- end navbar-inner -->
@@ -95,12 +113,14 @@
 							
 	{% if page != "login" %}
 	
+
+
 	
 	<!-- ## Stations ## -->
 	{% for station in stationlist %}
 	<section id="stationsection_{{ station.admin_port }}">
 	<div class="container-fluid">  <!-- *** fluid container *** -->
-			
+
 			<div class="row-fluid">
 					<div class="span1">
 					<!--<button id="btn-show-{{ station.admin_port }}" type="button" class="btn btn-mini"
@@ -111,7 +131,7 @@
 					</button>-->
 
 					 {% for url in station.stream_url %}
-					<button class="btn btn-mini " data-toggle="button" title="{{ url }}" onclick="toggle_audio('{{ url }}');">
+					<button class="btn btn-mini " data-toggle="button" title="{{ url }}" onclick="toggle_audio('{{ url }}', '{{ station.admin_port }}');">
 									<i class="icon-headphones"></i>
 					</button>
 					{% endfor %}
@@ -169,50 +189,47 @@
 	<hr>		
 	{% endfor %}
 	
+	<div id="player" class="span6 overlay" style="display:none">
+			<div class="container-fluid">
+			<small>
+					<h3>
+							Player
+							<button type="button" class="close" onclick="$('#player').toggle(); return false;">×</button>
+					</h3>
+			<p>
+					<div id="player-ajax"> 
+							player loading...
+					</div>
+			</p>
+			</small>
+			</div>
+	</div> 	<!-- end player -->
+
+	
 
 	<!-- ## Chat Box ## -->
-	<div id="chat1" class="span5 offset6 chat" style="display:none">
+	<div id="chat" class="span6 offset6 overlay" style="display:none">
 			<div class="container-fluid">
 					<small>
+					<h3>
+							Chat
+							<button type="button" class="close" onclick="$('#chat').toggle(); return false;">×</button>
+					</h3>
 					
-					<a role="button" class="btn btn-mini pull-right" onclick="$('.chat').toggle(); return false;">
-							<i class="icon-chevron-down"></i> Hide
-					</a>
-					<br>
-					<p>
 							<form action="" method="post" onsubmit="post_chat(); return false; "> <!-- chat -->
-									{% csrf_token %}
-									<div class="input-append"> <!-- chat input -->
-										  <input id="chatcontent" name="chatcontent" type="text">
-										  <button id="chatbutton" class="btn" type="submit"><i class="icon-comment"></i></button> 
-									</div> <!-- end chat input -->
+									{% csrf_token %}					
+									<input class="input-block-level" id="chatinput" name="chatinput" type="text">
 							</form>
-					</p>
-					<div id="content">
+					
+					<div id="chat-ajax">
 					</div>
 					</small>
 			</div>
-	</div> 	<!-- end chat 1 -->
-	<div id="chat2" class="span5 offset6 chat">
-			<div class="container-fluid">
-					<a id="togglechat" role="button" class="btn btn-mini pull-right" onclick="$('.chat').toggle(); return false;">
-							<i class="icon-chevron-up"></i> Chat
-					</a>
-			</div>
-	</div> 	<!-- end chat 2-->
+	</div> 	<!-- end chat -->
 	
 	
-	<!-- ## Player ## -->
-	<div id="player1" class="span5 offset1 player" style="display:none">
-		player loading...
-	</div> 	<!-- end chat 1 -->
-	<div id="player2" class="span5 offset1 player">
-			<div class="container-fluid">
-					<a id="togglechat" role="button" class="btn btn-mini pull-right" onclick="$('.player').toggle(); return false;">
-							<i class="icon-chevron-up"></i> Player
-					</a>
-			</div>
-	</div> 	<!-- end chat 2-->
+	
+	
 	
 	{% endif %}
 	
@@ -265,7 +282,9 @@
 					
 		main_interval = setInterval(function() { 		// sets Interval for automatic page updates
 				updatePage();
-			},2000);
+				render_chat();
+				render_player();
+			},10000);
 		
 		
 	});
@@ -290,8 +309,7 @@
 					}
 					stationlist[i]['last_track'] = current_track;
 					
-					render_chat();
-					render_player();
+					
 			}
 	}
 	
@@ -318,9 +336,9 @@
 		last_album = "";
 		$.get('/render-station-details/',{'station-port': station_port}).done(function(html){
 			$('#stationdetails_' + station_port).html(html);
-			render_stationdetails_library(station_port);
 			render_stationdetails_playqueue(station_port);
 			render_stationdetails_playlists(station_port);
+			enable_stationdetails_library(station_port);
 			highlight_current_song(station_port);
 			$('#stationcollapse_'+station_port).on('shown', function () {
 					update_lastfm_songinfo(station_port);
@@ -356,23 +374,35 @@
 		});
 	}
 	
-	function render_stationdetails_library(station_port) {
-		$.get('/render-station-details-library-artist/',{'station-port': station_port}).done(function(html){
-			$('#artistview_' + station_port).html(html);
+	function enable_stationdetails_library(station_port) {
+		$('.artist-page-link-' + station_port).on('click', function() {
+			
+			$('.artist-page-link-'  + station_port).parent().removeClass('active');
+			$(this).parent().addClass('active');
+			//$('#status_indicator').fadeIn();
+			
+			pageindex = $(this).text();
+			
+			$.get('/render-station-details-library-artist/',{'station-port': station_port, 'pageindex': pageindex}).done(function(html){
+				
+				$('#artistsearch-' + station_port).html(html);
+				$('#artistview').find('.accordion-toggle').on('click', function() {
+					
+					artist = $(this).text();
+					element = $(this).attr('href');
+					$.get('/render-station-details-library-album/',{'station-port': station_port, 'artist': artist}).done(function(html){
+						$(element).html(html);
+					});
+				});
 			});
+		});
+		
+
 		//$.get('/render-station-details-library-folder/',{'station-port': station_port}).done(function(html){
 		//	$('#folderview_' + station_port).html(html);
 		//	});
-		}
-	
-	function render_player() {
-	/*
-	 *  renders the chat contents
-	 */
-		$.get("/render-player/").done(function(html) {
-			$('#player1').html(html);
-		});
 	}
+
 	
 	function highlight_current_song(station_port) {
 	/*
@@ -384,13 +414,15 @@
 	}
 	
 	
-	function toggle_audio(url) {
+	function toggle_audio(url, port) {
 		if ($('#audiotag1').attr('src') == 'http://' + url) {
 			a.src = "";
+			$('#hidden-song-playing').attr('value',"");
 		}
 		else {
 			a.src='http://' + url; 
 			a.play();
+			$('#hidden-song-playing').attr('value', port);
 		}
 	}
 	
@@ -403,7 +435,16 @@
 			});
 	}
 	
-	
+		
+	function render_player() {
+	/*
+	 *  renders the chat contents
+	 */
+		port_playing = $('#hidden-song-playing').val();
+		$.get("/render-player/",{'port-playing':port_playing}).done(function(html) {
+			$('#player-ajax').html(html);
+		});
+	}
 	
 	
 	function render_chat() {
@@ -411,8 +452,8 @@
 	 *  renders the chat contents
 	 */
 		$.get("/render-chat/").done(function(html) {
-			$('#chat1').find('#content').html(html);
-			$('#chat').popover({'content': html, 'html': true});
+			$('#chat-ajax').html(html);
+			//$('#chat').popover({'content': html, 'html': true});
 			
 		});
 	}
@@ -422,22 +463,28 @@
 		/*
 		 *  post chat message to database
 		 */
-		chatmessage = document.getElementById('chatcontent').value;    	// get content from input
+		chatmessage = document.getElementById('chatinput').value;    	// get content from input
 		$.post('/post-chat/',{'chatmessage':chatmessage})				// post chatmessage
 		.success(function() {
 			render_chat();
 		});
-		$('#chatcontent').val("");									// set input to blank
+		$('#chatinput').val("");									// set input to blank
 	}
 	
 	
-	function clearInterval (interval) {
+	function clearInterval(interval) {
     /* 
 	 *  clears a given interval
 	 */
 		if (interval) {
 			clearInterval(interval);
 		}
+	}
+	
+	
+	
+	function artist_paged () {
+			;
 	}
 	
 		
@@ -505,6 +552,10 @@
 	}
     
 		
+	$('#save-settings').on('click', function() {
+			username = $('set-username').val();
+			$.post('/save.settings/', {'username':username});
+		});
 	
 	
 	

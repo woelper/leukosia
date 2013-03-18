@@ -170,6 +170,29 @@ class MPDPoller(object):
                 raise PollerError("Couldn't retrieve playlist: %s" % e)
         # Hurray!  We got the current lib without any errors!
         return library
+        
+    def get_albumlist(self, artist):
+        print '#######' + artist
+        try:
+            albumlist = self._client.list('album', 'artist', artist)
+        # Couldn't get the current song, so try reconnecting and retrying
+        except (MPDError, IOError):
+            # No error handling required here
+            # Our disconnect function catches all exceptions, and therefore
+            # should never raise any.
+            self.disconnect()
+            try:
+                self.connect()
+            # Reconnecting failed
+            except PollerError as e:
+                raise PollerError("Reconnecting failed: %s" % e)
+            try:
+                albumlist = self._client.list('album', 'artist', artist)
+            # Failed again, just give up
+            except (MPDError, IOError) as e:
+                raise PollerError("Couldn't retrieve playlist: %s" % e)
+        # Hurray!  We got the current lib without any errors!
+        return albumlist   
     
     def get_status(self):
         try:
@@ -316,7 +339,6 @@ def render_station_overview(request):
 	stationlist = get_stationlist()
 	admin_port = request.GET['port'].encode('utf-8')
 	for station in stationlist:
-		print station
 		if admin_port == str(station['admin_port']):
 			stream_port = str(station['stream_port'])
 			stream_name = station['stream_name']
@@ -380,6 +402,10 @@ def render_station_details(request):
 				break
 	except:
 		current_song = False
+		
+	alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+			 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+			 'w', 'x', 'y', 'z']
 	
 	#current_song['time'] = str(datetime.timedelta(seconds=int(current_song['time'])))[2:]
 	#artist = lastfm.get_artist("System of a Down")
@@ -390,7 +416,8 @@ def render_station_details(request):
 	return render_to_response('stations_stationdetails.html',
 							{'current_song': current_song,
 							'station_port':admin_port,
-							'queue':queue},
+							'queue':queue,
+							'alphabet': alphabet},
 							context_instance=RequestContext(request))
     
 def render_station_details_playqueue(request):
@@ -444,6 +471,9 @@ def render_station_details_library_artist(request):
 
 	"""
 	admin_port = request.GET['station-port'].encode('utf-8')
+	pageindex = False
+	if request.GET['pageindex']:
+		pageindex = request.GET['pageindex'].encode('utf-8')
 	library = {}
 	try:
 		poller = MPDPoller(admin_port)
@@ -452,22 +482,75 @@ def render_station_details_library_artist(request):
 		poller.disconnect()
 	except:
 		pass
-	library.sort()
+	library.sort(key=lambda s: s.lower())
+	tmp = []
+	if pageindex:
+		for e in library:
+			if e != "":
+				if e[0].lower() == pageindex:
+					tmp.append(e)
+		library = tmp
 	return render_to_response('stations_stationdetails_library_artist.html',
 							{'station_port':admin_port,
 							'library':library},
 							context_instance=RequestContext(request))
+							
+def render_station_details_library_album(request):
+	"""
+
+	gets html for playqueue of details of stations
+	and renders it
+
+	"""
+	admin_port = request.GET['station-port'].encode('utf-8')
+	artist = request.GET['artist'].encode('utf-8').strip()
+	albums = "no Albums found"
+	try:
+		poller = MPDPoller(admin_port)
+		poller.connect()
+		albums = poller.get_albumlist(artist)
+		poller.disconnect()
+	except:
+		pass
+	poller = MPDPoller(admin_port)
+	poller.connect()
+	albums = poller.get_albumlist(artist)
+	poller.disconnect()
+	return render_to_response('stations_stationdetails_library_album.html',
+							{'station_port': admin_port,
+							'albums': albums},
+							context_instance=RequestContext(request))
 
 def render_player(request):
-    """
+	"""
 
-    gets html for list of the 10 last chat messages
-    and renders it
+	gets html for list of the 10 last chat messages
+	and renders it
 
-    """
-    return render_to_response('player.html',
-                              {},
-                              context_instance=RequestContext(request))
+	"""
+	port_playing = request.GET['port-playing'].encode('utf-8')
+	current_song = False
+	status = False
+	if port_playing != "":
+		try:
+			poller = MPDPoller(port_playing)
+			poller.connect()
+			#current_song = poller.get_current_song()
+			status =  poller.get_status()
+			print str(status)
+			queue = poller.get_queue()
+			poller.disconnect()
+			for q in queue:
+				if q['id'] == status['songid']:
+					current_song = q
+					print current_song
+					break
+		except:
+			pass
+	return render_to_response('player.html',
+								{'current_song':current_song,
+								'status': status},
+								context_instance=RequestContext(request))
 
 
 
@@ -528,6 +611,11 @@ def mpd_cmd(request):
 		pass
 	return HttpResponse("")
 
+
+def save_settings(request):
+	username = request.GET['username'].encode('utf-8')
+	print username
+	return HttpResponse("")
 
 def logout_view(request):
     """

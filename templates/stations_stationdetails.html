@@ -70,11 +70,24 @@
 						</div> <!-- ** end tab playlist ** -->
 						
 						<div class="tab-pane fade" id="artistview_{{ station_port }}">
-loading...
+							
+							<div class="pagination pagination-small">
+									<ul>
+											{% for e in alphabet %}
+													<li><a class="artist-page-link-{{ station_port }}" href="#" onclick="return false;">{{ e }}</a></li>
+											{% endfor %}
+									</ul>
+							</div>
+							
+							<input class="input-block-level"></input>
+							
+							<div id="artistsearch-{{ station_port }}">
+							
+							</div>
 						</div>
 
 						<div class="tab-pane fade" id="folderview_{{ station_port }}">
-loading...
+							
 						</div>
 												
 						<div class="tab-pane fade" id="tab6">

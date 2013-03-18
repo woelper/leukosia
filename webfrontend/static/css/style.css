@@ -15,16 +15,16 @@ position:absolute;
 img.lastfm {
 	width:auto;
 }
-.chat, .player {
+.overlay {
 	position:fixed;
 	bottom:0px;
 	max-height:50%;
 	overflow:auto;
 	background-color:inherit;
-	//border:1px solid #eeeeee;
-	//-moz-box-shadow:0px 0px 5px 1px #eeeeee;
-	//-webkit-box-shadow:0px 0px 5px 1px #eeeeee;
-	//box-shadow:0px 0px 5px 1px #eeeeee;
+	
+	-moz-box-shadow:0 0 5em #dddddd;
+	-webkit-box-shadow:0 0 1em #dddddd;
+	box-shadow:0 0 1em #dddddd;
 }
 #chat2 {
 	height:auto;
