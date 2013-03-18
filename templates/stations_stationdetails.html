@@ -71,16 +71,22 @@
 						
 						<div class="tab-pane fade" id="artistview_{{ station_port }}">
 							
-							<div class="pagination pagination-small">
+								<div class="pagination pagination-small">
 									<ul>
 											{% for e in alphabet %}
 													<li><a class="artist-page-link-{{ station_port }}" href="#" onclick="return false;">{{ e }}</a></li>
 											{% endfor %}
 									</ul>
-							</div>
-							
-							<input class="input-block-level"></input>
-							
+								</div>
+									<form class="form-search"  action="" method="get" onsubmit="search_database(); return false; ">
+									  <div class="input-append">
+										<input type="text" class="input-xxlarge search-query">
+										<button type="submit" class="btn">Search Artist</button>
+									  </div>
+									  
+									</form>
+																
+							<hr>			
 							<div id="artistsearch-{{ station_port }}">
 							
 							</div>
