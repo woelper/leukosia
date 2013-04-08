@@ -622,7 +622,8 @@ def search(request):
 def mpd(request):
 	
 	response = ''
-	port = str(request.session.get('station')['admin_port'])
+	port = str(request.session.get('admin_port'))
+	
 	
 	poller = MPDPoller(port)
 	poller.connect()
