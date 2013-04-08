@@ -623,8 +623,7 @@ def mpd(request):
 	
 	response = ''
 	port = str(request.session.get('admin_port'))
-	
-	
+
 	poller = MPDPoller(port)
 	poller.connect()
 	
@@ -717,6 +716,31 @@ def mpd(request):
 
 	return HttpResponse(response)
 	
+def add(request):
+	msg = ""
+	port = request.session.get('admin_port')
+	element_id = request.POST['element-id']
+	add_type = request.POST['type']
+	if add_type == "artist":
+		artist = Artist.objects.get(pk = element_id)
+		songs = Song.objects.filter(artist = artist)
+	elif add_type == "album":
+		album = Album.objects.get(pk = element_id)
+		songs = Song.objects.filter(album=album)
+	counter = 0
+	for song in songs:
+		counter = counter +1
+		poller = MPDPoller(port)
+		poller.connect()
+		poller.command('add', song.mpd_path)
+		poller.disconnect()
+	msg = '<div class="alert">' + \
+			'<button type="button" class="close" ' + \
+			'data-dismiss="alert">&times;</button>' + \
+			str(counter) + \
+			' songs added to queue'
+	print msg
+	return HttpResponse(msg)
 
 
 def render_player(request):
