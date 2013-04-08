@@ -53,6 +53,7 @@
 					$('#stationheader').html(html);
 				});
 				$.get('/queue/').success(function(html){
+					
 					$('#stationcontent').html(html);
 					$('.pill-btn').parent().removeClass('active');
 					$('#queue').parent().addClass('active');
