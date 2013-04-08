@@ -30,6 +30,7 @@
 					{{ artist.album_count }} albums, {{ artist.track_count }} tracks
 				</span></p>
 				<p class="muted">{{ artist.lastfm_genre }}</p>
+				<button id="{{ artist.id }}" class="btn btn-mini add artist">add to playlist</button>
 			</div>
 		</div>
 	</div>
@@ -39,7 +40,7 @@
 		
 		{% for album in albums %}
 			{% cycle '<div class="row-fluid">' '' '' %}
-				<div class="span2">
+				<div class="span1">
 					<p>
 						<img src="{{ album.lastfm_cover }}" />
 					</p>
@@ -47,6 +48,7 @@
 				<div class="span2">
 					<h5>{{ album.name }}</h5>
 					<p>{{ album.lastfm_release_year }}</p>
+					<button id="{{ album.id }}" class="btn btn-mini add album">add to playlist</button>
 				</div>
 			
 			
@@ -118,6 +120,21 @@
 		.success(function(html){
 			$('#stationcontent').html(html);
 		});
+	});
+	
+	$('.add').on('click', function(){
+		var element_id = $(this).attr('id');
+		if ($(this).hasClass('album')) {
+			$.post('/add/', {'element-id': element_id, 'type': 'album'})
+			.success(function(html){
+				;
+			});
+		else if ($(this).hasClass('artist')) {
+			$.post('/add/', {'element-id': element_id, 'type': 'album'})
+			.success(function(html){
+				;
+			});
+		}
 	});
 	
 	

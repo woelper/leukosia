@@ -1,0 +1,194 @@
+
+<!-- Content of stationheader.html
+    ================================================== -->
+
+<div class="well well-small">
+	
+	<div class="row-fluid">
+		<div class="span3">
+			<h3>
+				{{ station.stream_name }} 
+				<span id="listen" class="btn btn-small"><i class="icon-headphones"></i></span>
+			</h3>
+		</div>
+			<span class="badge badge-{{ station.badge }} pull-right">{{ station.status_display }}</span>
+	</div>
+		
+	<div class="row-fluid">
+		{% if station.album.albumcover %}
+		<div class="span1">
+			<img src="{{ station.album.albumcover }}" />
+		</div>
+		{% endif %}
+		{% if station.current_song %}
+		<div class="span11">
+			<div class="row-fluid">
+				<div class="span12">
+					{{ station.current_song.artist }} - {{ station.current_song.title }}
+				</div>
+			</div>
+			{{ station.time }}
+			<div class="row-fluid">
+				
+				<div class="{% if station.album.albumcover %}span11{% else %}span12{% endif %}">
+					<div class="progress">
+						<div class="bar" style="width: {{ station.progress }}%;"></div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+		{% else %}
+			* End of Queue reached *
+		{% endif %}
+	</div>
+	<div class="row-fluid">
+		<div class="btn-toolbar">
+			<div class="btn-group">
+				<button id="previous" class="btn btn-small" title="previous song">
+					<i class="icon-step-backward"></i>
+				</button>
+				<button id="play" class="btn btn-small" title="play">
+					<i class="icon-play"></i>
+				</button>
+				<button id="pause" class="btn btn-small" title="pause">
+					<i class="icon-pause"></i>
+				</button>
+				<button id="stop" class="btn btn-small" title="stop">
+					<i class="icon-stop"></i>
+				</button>
+				<button id="next" class="btn btn-small" title="next song">
+					<i class="icon-step-forward"></i>
+				</button>
+			</div> <!-- end buttongroup -->
+			
+			<div class="btn-group">
+				<button id="random" class="btn btn-small" title="random"><i class="icon-random"></i></button>
+				<button id="repeat" class="btn btn-small" title="repeat queue"><i class="icon-repeat"></i></button>
+				<button id="" class="btn btn-small"><i class="icon-"></i></button>
+			</div> <!-- end buttongroup -->
+			
+		</div> <!-- end buttontoolbar -->
+	</div>
+	
+</div>
+
+
+	<!-- Le javascript from stations_stationlist.html
+    ================================================== -->
+  
+
+    <script type="text/javascript">
+		
+		
+	var a = document.getElementsByTagName("audio")[0];
+		
+    $(document).ready(function() {
+		
+		if ($('#audiotag1').attr('src') == 'http://{{ station.stream_url|first }}') {
+			$('#listen').addClass('btn-primary');
+			$('#listen').find('i').addClass('icon-white');
+		}
+		if ('{{ station.status.state }}' == 'play') {
+			$('#play').addClass('btn-primary');
+			$('#play').find('i').addClass('icon-white');
+		}
+		else {
+			$('#play').removeClass('btn-primary');
+			$('#play').find('i').removeClass('icon-white');
+		}
+		
+		if ('{{ station.status.state }}' == 'pause') {
+			$('#pause').addClass('btn-primary');
+			$('#pause').find('i').addClass('icon-white');
+		}
+		else {
+			$('#pause').removeClass('btn-primary');
+			$('#pause').find('i').removeClass('icon-white');
+		}
+		
+		if ('{{ station.status.state }}' == 'stop') {
+			$('#stop').addClass('btn-primary');
+			$('#stop').find('i').addClass('icon-white');
+		}
+		else {
+			$('#stop').removeClass('btn-primary');
+			$('#stop').find('i').removeClass('icon-white');
+		}
+		
+		if ('{{ station.status.random }}' == '1') {
+			$('#random').addClass('btn-primary');
+			$('#random').find('i').addClass('icon-white');
+		}
+		else {
+			$('#random').removeClass('btn-primary');
+			$('#random').find('i').removeClass('icon-white');
+		}
+		
+		if ('{{ station.status.repeat }}' == '1') {
+			$('#repeat').addClass('btn-primary');
+			$('#repeat').find('i').addClass('icon-white');
+		}
+		else {
+			$('#repeat').removeClass('btn-primary');
+			$('#repeat').find('i').removeClass('icon-white');
+		}
+		
+		$('#stationheader').find('.btn').on('click', function() {
+			var btn_id = $(this).attr('id');
+			if (btn_id != 'listen') {
+				$.post('/mpd/', {'action': btn_id})
+				.done(function() {
+					$.get('/stationheader/').success(function(html){
+						$('#stationheader').html(html);
+					});
+				});
+			}
+			else {
+				toggle_audio();
+			}
+			
+		});
+	});
+	
+	function toggle_audio() {
+		if ($('#audiotag1').attr('src') == 'http://{{ station.stream_url|first }}') {
+			a.src = "";
+			$('#listen').removeClass('btn-primary');
+			$('#listen').find('i').removeClass('icon-white');
+			clearInterval(listen_interval);
+			clearInterval(player_interval);
+			$('#footer').animate({
+				height: '0px'
+			},3000);
+			
+		}
+		else {
+			a.src='http://{{ station.stream_url|first }}';
+			a.play();
+			$('#listen').addClass('btn-primary');
+			$('#listen').find('i').addClass('icon-white');
+			clearInterval(listen_interval);
+			$.post('/register-listen-port/{{ station.admin_port}}/').
+			success(function(){
+				$.get('render-player/').
+				success(function(html) {
+					$('#player').html(html);
+					$('#footer').animate({
+						height: '70px'
+					},1000);
+				});
+				player_interval = setInterval(function(){
+					$.get('render-player/').
+						success(function(html) {
+							$('#player').html(html);
+					});
+				},5000);
+				listen_interval = setInterval(function(){
+					$.post('/listen/');
+				},20000);
+			});
+		}
+	}
+    
+	</script>

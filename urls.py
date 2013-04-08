@@ -33,21 +33,22 @@ urlpatterns = patterns('',
     url(r'^register-listen-port/(?P<port>\w+)/$', 'webfrontend.views.register_listen_port', name='register_listen_port'),
 
     url(r'^mpd/', 'webfrontend.views.mpd', name='mpd'),
+    url(r'^add/', 'webfrontend.views.add', name='add'),
 
     
    
     
     # urls for rendering dynamic content
-    url(r'^render-station-overview/', 'webfrontend.views.render_station_overview'),
-    url(r'^render-station-details/', 'webfrontend.views.render_station_details'),
-    url(r'^render-station-details-playqueue/', 'webfrontend.views.render_station_details_playqueue'),
-    url(r'^render-station-details-playlists/', 'webfrontend.views.render_station_details_playlists'),
-    url(r'^render-station-details-library-artist/', 'webfrontend.views.render_station_details_library_artist'),
-    url(r'^render-station-details-library-album/', 'webfrontend.views.render_station_details_library_album'),
+    #url(r'^render-station-overview/', 'webfrontend.views.render_station_overview'),
+    #url(r'^render-station-details/', 'webfrontend.views.render_station_details'),
+    #url(r'^render-station-details-playqueue/', 'webfrontend.views.render_station_details_playqueue'),
+    #url(r'^render-station-details-playlists/', 'webfrontend.views.render_station_details_playlists'),
+    #url(r'^render-station-details-library-artist/', 'webfrontend.views.render_station_details_library_artist'),
+    #url(r'^render-station-details-library-album/', 'webfrontend.views.render_station_details_library_album'),
     #url(r'^render-station-details-library-folder/', 'webfrontend.views.render_station_details_library_folder'),
-    url(r'^render-player/', 'webfrontend.views.render_player'),
+
     url(r'^render-chat/', 'webfrontend.views.render_chat'),
-    url(r'^save-settings/', 'webfrontend.views.save_settings'),
+    #url(r'^save-settings/', 'webfrontend.views.save_settings'),
     
     url(r'^update-database/', 'webfrontend.views.update_songdatabase'),
     
