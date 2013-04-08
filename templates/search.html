@@ -1,0 +1,135 @@
+{% load jsonify %}
+<!-- Content of search.html
+    ================================================== -->
+
+	<form id="form-search" class="form-search">
+	  <div class="input-append">
+		<input id="search-term" type="text" class="search-query" data-provide="typeahead" value="{{ searchterm }}">
+		<button type="submit" class="btn">Search</button>
+	  </div>
+	</form>
+	<hr>
+	{% if notfound %}
+	<div class="alert">
+		<button type="button" class="close" data-dismiss="alert">&times;</button>
+		Could not find <strong>'{{searchterm}}'</strong>! If you think this is wrong, upload it!
+	</div>
+	{% endif %}
+	{% for artist in artists_exact %}
+	<div class="container-fluid">
+		
+		<div class="row-fluid">
+			<div class="span3">
+				<p>
+				<img src="{{ artist.lastfm_coverimage }}" />
+				</p>
+			</div>
+			<div class="span9">
+				<h4>{{ artist.name }}</h4>
+				<p class="muted">
+					{{ artist.album_count }} albums, {{ artist.track_count }} tracks
+				</span></p>
+				<p class="muted">{{ artist.lastfm_genre }}</p>
+			</div>
+		</div>
+	</div>
+	{% if albums %}
+	<hr>
+	<div class="container-fluid">
+		
+		{% for album in albums %}
+			{% cycle '<div class="row-fluid">' '' '' %}
+				<div class="span2">
+					<p>
+						<img src="{{ album.lastfm_cover }}" />
+					</p>
+				</div>
+				<div class="span2">
+					<h5>{{ album.name }}</h5>
+					<p>{{ album.lastfm_release_year }}</p>
+				</div>
+			
+			
+			
+			
+			{% cycle '' '' '</div>' %}
+		{% endfor %}
+		
+	</div>
+	{% endif %}
+	<hr>
+	
+	{% endfor %}
+	<div class="container-fluid">
+
+		{% for artist in artists_other %}
+		{% cycle '<div class="row-fluid">' '' '' '' '' '' %}
+			<div class="span2">
+				<a id="{{ artist.id }}"  class="artistlink" href="#"><h4>{{ artist.name }}</h3></a>
+				<span>
+					{{ artist.album_count }} albums, {{ artist.track_count }} tracks
+				</span><br>
+				<span class="muted">
+					{{ artist.lastfm_genre }}
+				</span>
+			</div>
+			{% cycle '' '' '' '' '' '</div>' %}
+		{% endfor %}
+		<!--<div class="span4">
+		<h4>Albums</h4>
+			{% for album in albums_exact %}
+				{{ album }}<br><hr>
+			{% endfor %}
+			{% for album in albums_other %}
+				{{ album }}<br>
+			{% endfor %}
+		</div>
+		<div class="span4">
+		<h4>Songs</h4>
+			{% for song in songs_exact %}
+				{{ song }}<br><hr>
+			{% endfor %}
+			{% for song in songs_other %}
+				{{ song }}<br>
+			{% endfor %}
+		</div>-->
+	</div>
+	
+
+
+
+	<!-- Le javascript from stations_stationlist.html
+    ================================================== -->
+
+    <script type="text/javascript">
+	$(document).ready(function(){
+		;
+		//var data = {{ artists_all|jsonify }};
+		//options = ["eins","zwei"]
+		//var data = {'options': ["eins", "zwei"]}
+		//alert (data);
+		//alert(options);
+		//$('#search-term').typeahead({source: options });
+	});
+	
+	$('.artistlink').on('click', function(){
+		var artistid = $(this).attr('id');
+		$.post('/search/', {'artistid': artistid})
+		.success(function(html){
+			$('#stationcontent').html(html);
+		});
+	});
+	
+	
+	$('#form-search').on('submit',function(){
+		term = $('#search-term').val();
+		$.post('/search/', {'term': term})
+		.success(function(html){
+			$('#stationcontent').html(html);
+		});
+		return false;
+	});
+	
+    
+    
+	</script>

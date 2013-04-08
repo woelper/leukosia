@@ -1,0 +1,106 @@
+<!-- Content of stations_stationdetails_playqueue.html
+    ================================================== -->
+    
+
+<!--<button class="btn pull-right" onclick="mpd({'cmd': 'clear', 'port': '{{ station_port }}'}); return false;"><i class="icon-remove"></i></i> Clear Playlist</button>
+<button class="btn pull-right" href="#playlistSaveModal_{{ station_port }}" data-toggle="modal"><i class="icon-share"></i></i> Save Playlist</button>
+-->
+<!-- Modal -->
+<div id="playlistSaveModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Save playlist</h3>
+  </div>
+  <div class="modal-body">
+    <input id="playlistname" type="text" class="input input-xlarge" placeholder="Enter a name"><br>
+    <input id="playlistport" type="hidden" value="">
+    
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    <button id ="playlistsave" data-dismiss="modal" class="btn btn-primary">Save Playlist</button>
+  </div>
+</div>
+
+<table class="table">
+		
+		<tbody>
+				{% for a in queue %}
+				
+				<tr class="playlistrow_{{ station.admin_port }}">
+						<td> 
+							{%if current_song_file == a.file %}<strong>{% endif %}
+								<span class="muted">{{a.pos}}</span>
+							{%if current_song_file == a.file %}</strong>{% endif %}
+						</td>
+						<td class="dropdown">
+								<a class="btn btn-mini dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></i></a>
+							  
+								  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+											<li><a tabindex="-1" href="#" id="play-{{a.id}}"><i class="icon-play"></i> Play Song</a></li>
+											<li class="divider"></li>
+											<li><a tabindex="-1" href="#" id="removesong-{{a.id}}"><i class="icon-remove"></i> Remove Song</a></li>
+											<li><a tabindex="-1" href="#" id="removealbum-{{a.id}}"><i class="icon-remove"></i> Remove Album</a></li>
+											<li><a tabindex="-1" href="#" id="removeartist-{{a.id}}"><i class="icon-remove"></i> Remove Artist</a></li>
+											<li class="divider"></li>
+											<li><a tabindex="-1" href="#" id="clearplaylist"><i class="icon-trash"></i> Clear Playlist</a></li>
+								  </ul>
+						</td>
+																
+						<!--<td><img src="{{ a.albumcover }}" style="height:20px;width:20px;"></td>-->
+						<td> 
+							{%if current_song_file == a.file %}<strong>{% endif %}
+								{{a.title}}
+							{%if current_song_file == a.file %}</strong>{% endif %}
+						</td>
+						
+						<td>
+							{%if current_song_file == a.file %}<strong>{% endif %}
+								{{a.artist}}
+							{%if current_song_file == a.file %}</strong>{% endif %}</td>
+						<td>
+							<td> 
+							{%if current_song_file == a.file %}<strong>{% endif %}
+								{{ a.track }}
+							{%if current_song_file == a.file %}</strong>{% endif %}
+							</td>
+							<td>
+							{%if current_song_file == a.file %}<strong>{% endif %}
+								{% if a.album %} {{a.album}} {% endif %}
+								{% if a.date %} ({{a.date}}) {% endif %}
+							{% if current_song_file == a.file %}</strong>{% endif %}
+						</td>
+						<td>
+							{%if current_song_file == a.file %}<strong>{% endif %}
+								{{a.time}}
+							{%if current_song_file == a.file %}</strong>{% endif %}
+						</td>
+						<!--<td>
+							{%if current_song_file == a.file %}<strong>{% endif %}
+								{{a.genre}}
+							{%if current_song_file == a.file %}</strong>{% endif %}
+						</td>-->
+						
+				</tr>
+				{% endfor %}
+		</tbody>
+</table>
+
+<!-- Le javascript from queue.html
+    ================================================== -->
+  
+
+    <script type="text/javascript">
+		
+		$(document).ready(function(){
+			$('.dropdown-menu').children().on('click', function(){
+				var action = $(this).children().attr('id');
+				$.post('/mpd/',{'action': action}).success(function(){
+					$.get('/queue/').success(function(html){
+						$('#stationcontent').html(html);
+					});
+				});
+			});
+		});
+		
+	</script>

@@ -5,10 +5,12 @@
   <head>
 	  
 	    <meta charset="utf-8">
-	    <title>leukosia</title>
+	    <title>Turbosloth</title>
 	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	    <meta name="description" content="">
 	    <meta name="author" content="">
+	    
+	    <link href="{{STATIC_URL}}img/favicon.ico" rel="icon" type="image/x-icon">
 	 
 	
 	    <!-- Le styles -->
@@ -85,7 +87,6 @@
 								
 								<!-- HTML5 Audio Tag -->
 								<audio id="audiotag1" src=""></audio>
-								<input type="hidden" id="hidden-song-playing" value=""></input>
 								
 								{% endif%}
 					</div> <!-- end navbar-inner -->
@@ -102,134 +103,24 @@
     ================================================== -->
 	{% endif %}
 	{% if page == "login" %}
-	 <div class="container-fluid">  <!-- *** fluid container *** -->
-			<div class="row-fluid"> <!-- ** row fluid ** -->
-			
-					{% block content %}
-					{% endblock %}
-					
-			</div> <!-- ** end row fluid **-->
-	</div> <!-- *** end fluid container *** -->
+		{% block login %}
+		{% endblock %}
 	{% endif %}
-							
+	
+
 	{% if page != "login" %}
 	
-
-
+	<div id="maincontent">
+	</div>
 	
-	<!-- ## Stations ## -->
-	{% for station in stationlist %}
-	<section id="stationsection_{{ station.admin_port }}">
-	<div class="container-fluid">  <!-- *** fluid container *** -->
-
-			<div class="row-fluid">
-					<div class="span1">
-					<!--<button id="btn-show-{{ station.admin_port }}" type="button" class="btn btn-mini"
-							
-							data-toggle="collapse" data-target="#stationcollapse_{{ station.admin_port }}">
-							<i class="icon-chevron-down">
-							</i>
-					</button>-->
-
-					 {% for url in station.stream_url %}
-					<button class="btn btn-mini " data-toggle="button" title="{{ url }}" onclick="toggle_audio('{{ url }}', '{{ station.admin_port }}');">
-									<i class="icon-headphones"></i>
-					</button>
-					{% endfor %}
-
-					</div>
-					
-					<div class="span10" id="stationoverview_{{ station.admin_port }}">
-					</div>
-					<!--
-					<div class="span1" id="stationoverview_{{ station.admin_port }}">
-							{% for url in station.stream_url %}
-							<button class="btn btn-mini hidden-phone" data-toggle="button" title="{{ url }}" onclick="toggle_audio('{{ url }}');">
-									<i class="icon-headphones"></i>
-							</button>
-							{% endfor %}
-					</div>
-					-->
+	<div id="footer" class="container-fluid">
+		<div>
+			<div id="player">
+				<p>* not streaming *</p>
 			</div>
-			<div id="stationcollapse_{{ station.admin_port }}" class="collapse">
-					<br>
-					<div class="well container-fluid">
-							<div class="row-fluid">
-									<div class="btn-toolbar">
-										  <div class="btn-group">
-											<button class="btn" onclick="mpd({'cmd': 'previous', 'port': '{{ station.admin_port }}'})">
-													<i class="icon-step-backward"></i>
-											</button>
-											<button class="btn" onclick="mpd({'cmd': 'play', 'port': '{{ station.admin_port }}'})">
-													<i class="icon-play"></i>
-											</button>
-											<button class="btn" onclick="mpd({'cmd': 'pause', 'port': '{{ station.admin_port }}'})">
-													<i class="icon-pause"></i>
-											</button>
-											<button class="btn" onclick="mpd({'cmd': 'stop', 'port': '{{ station.admin_port }}'})">
-													<i class="icon-stop"></i>
-											</button>
-											<button class="btn" onclick="mpd({'cmd': 'next', 'port': '{{ station.admin_port }}'})">
-													<i class="icon-step-forward"></i>
-											</button>
-										  </div>
-										  <div class="btn-group">
-											<button class="btn"><i class="icon-random"></i></button>
-											<button class="btn"><i class="icon-repeat"></i></button>
-											<button class="btn"><i class="icon-"></i></button>
-										  </div>
-									</div>
-							</div><!-- ** end row fluid **-->
-							<div id="stationdetails_{{ station.admin_port }}" class="row-fluid">
-							</div> <!-- ** end stationdetails fluid **-->
-					</div>
-			</div> <!-- ** end stationcollapse fluid **-->
-			
-	</div> <!-- *** end fluid container *** -->
-	</section>
-	<hr>		
-	{% endfor %}
-	
-	<div id="player" class="span6 overlay" style="display:none">
-			<div class="container-fluid">
-			<small>
-					<h3>
-							Player
-							<button type="button" class="close" onclick="$('#player').toggle(); return false;">×</button>
-					</h3>
-			<p>
-					<div id="player-ajax"> 
-							player loading...
-					</div>
-			</p>
-			</small>
-			</div>
-	</div> 	<!-- end player -->
-
-	
-
-	<!-- ## Chat Box ## -->
-	<div id="chat" class="span6 offset6 overlay" style="display:none">
-			<div class="container-fluid">
-					<small>
-					<h3>
-							Chat
-							<button type="button" class="close" onclick="$('#chat').toggle(); return false;">×</button>
-					</h3>
-					
-							<form action="" method="post" onsubmit="post_chat(); return false; "> <!-- chat -->
-									{% csrf_token %}					
-									<input class="input-block-level" id="chatinput" name="chatinput" type="text">
-							</form>
-					
-					<div id="chat-ajax">
-					</div>
-					</small>
-			</div>
-	</div> 	<!-- end chat -->
-	
+		</div>
+	</div>
 	{% endif %}
-	
 
 				
 
@@ -243,13 +134,57 @@
 
     <script src="http://code.jquery.com/jquery-latest.js"></script>
     <script src="{{STATIC_URL}}ext/bootstrap/js/bootstrap.js"></script>
-   <script src="{{STATIC_URL}}ext/lowlag/lowlag.js"></script>
+	
 	
 	
 	{% if page != "login" %}
     
    	<script type="text/javascript">
+	
+	var listen_interval;
+	var player_interval;
+	var stationoverview_interval;
+	var stationheader_interval;
+	
+	
+	$(document).ready(function(){
+		$.get('/overview/main').success(function(html){
+			$('#maincontent').html(html);
+		});
+		$('#update-database').on('click', function() {
+			$.post('/update-database/');
+		});
+	});
+	
+
+	
+	
+	function mpd(args) {
+			$.post('/mpd-cmd/', args)
+			.done(function() {
+				;
+				//highlight_current_song(args['port']);
+				//render_stationdetails_playqueue(args['port']);
+				//render_stationdetails_playlists(args['port']);
+			});
+	}
+	
+	
+	
+	
+	
+	
+/*	
+	
+	function highlight_current_song(station_port) {
+
+		current_id = $('#hidden-id_' + station_port).val();
+		$('.playlistrow_' + station_port).removeClass('info');  
+		$('#playlistid_' + station_port + "_" + current_id).addClass('info');
+	}
+*/
 		
+	/*
 	var html = "";
 	var last_track = "";
 	var cur_track = false;
@@ -261,11 +196,7 @@
 
 	
 	$(document).ready(function () {
-	/*
-	 *  On first load: 
-	 *  - renders the list view of the Stations
-	 *  - renders the chat-contents
-	 */
+	
 		updatePage();
 		
 		for (i in stationlist) { 		// inital page rendering
@@ -315,10 +246,7 @@
 	
 	
 	function render_stationoverview(station_port) {
-	/* 
-	 *  gets the station infos via ajax request
-	 *  and renders the equivalent html id in the station overview
-	 */
+	
 	 		$.get('/render-station-overview',{'port':station_port})
 			.done(function(html) {
 					$('#stationoverview_' + station_port).html(html);
@@ -326,9 +254,7 @@
 	}
 	
 	function render_stationdetails(station_port) {
-	/* 
-	 *  gets the html for the desired station and renders it
-	 */
+	
 		var artist = $('#hidden-artist_' + station_port).val();
 		var album = $('#hidden-album_' + station_port).val();
 		
@@ -349,9 +275,7 @@
 	}
 	
 	function render_stationdetails_playqueue(station_port) {
-	/* 
-	 *  gets the html for the playqueue of the desired station and renders it
-	 */
+	
 		$.get('/render-station-details-playqueue/',{'station-port': station_port}).done(function(html){
 			$('#playqueue_' + station_port).html(html);
 			$('#playlistsave_' + station_port).on('click', function() {  // bind the clickhandler for the playlistsave button
@@ -366,9 +290,7 @@
 	}
 	
 	function render_stationdetails_playlists(station_port) {
-	/* 
-	 *  gets the html for the playqueue of the desired station and renders it
-	 */
+	
 		$.get('/render-station-details-playlists/',{'station-port': station_port}).done(function(html){
 			$('#playlists_' + station_port).html(html);
 		});
@@ -405,9 +327,7 @@
 
 	
 	function highlight_current_song(station_port) {
-	/*
-	 *  highlights the currently played song on playqueue
-	 */
+	
 		current_id = $('#hidden-id_' + station_port).val();
 		$('.playlistrow_' + station_port).removeClass('info');  
 		$('#playlistid_' + station_port + "_" + current_id).addClass('info');
@@ -440,9 +360,7 @@
 	
 		
 	function render_player() {
-	/*
-	 *  renders the chat contents
-	 */
+	
 		port_playing = $('#hidden-song-playing').val();
 		$.get("/render-player/",{'port-playing':port_playing}).done(function(html) {
 			$('#player-ajax').html(html);
@@ -451,9 +369,7 @@
 	
 	
 	function render_chat() {
-	/*
-	 *  renders the chat contents
-	 */
+	
 		$.get("/render-chat/").done(function(html) {
 			$('#chat-ajax').html(html);
 			//$('#chat').popover({'content': html, 'html': true});
@@ -463,9 +379,7 @@
 		
 	
 	function post_chat() {
-		/*
-		 *  post chat message to database
-		 */
+	
 		chatmessage = document.getElementById('chatinput').value;    	// get content from input
 		$.post('/post-chat/',{'chatmessage':chatmessage})				// post chatmessage
 		.success(function() {
@@ -476,9 +390,7 @@
 	
 	
 	function clearInterval(interval) {
-    /* 
-	 *  clears a given interval
-	 */
+  
 		if (interval) {
 			clearInterval(interval);
 		}
@@ -560,7 +472,7 @@
 			$.post('/save.settings/', {'username':username});
 		});
 	
-	
+	*/
 	
 	
 	$(document).ajaxSend(function(event, xhr, settings) {

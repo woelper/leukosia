@@ -1,0 +1,110 @@
+
+<!-- Content of station.html
+    ================================================== -->
+
+
+<div id="main-container" class="container-fluid">	
+	<div class="row-fluid">
+		
+		<div id="stationoverview" class="span3">	
+		</div> <!-- end stationoverview -->
+		
+		<div id="stationwrapper" class="span9">
+			<div id="stationheader">
+			</div> <!-- end stationheader -->
+				<ul class="nav nav-pills">
+					<!--<li class="nav-header">Radio Station</li>-->
+					<li class="active"><a id="queue" class="pill-btn" href="" onclick="return false;">Queue</a></li>
+					<li><a id="nowplaying" class="pill-btn" href="" onclick="return false;">Now Playing</a></li>
+					<!--<li class="nav-header">Library</li>-->
+					<li><a id ="search" class="pill-btn" href="" onclick="return false;">Search</a></li>
+					<li><a id="explore" class="pill-btn" href="" onclick="return false;">Explore</a></li>
+					
+				</ul>
+			<div id="stationcontent">
+			</div> <!-- end stationcontent -->
+		</div> <!-- end stationwrapper -->
+			
+	</div> <!-- end row-fluid -->
+	
+</div> <!-- end maincontainer -->
+
+
+
+
+	<!-- Le javascript from stations_stationlist.html
+    ================================================== -->
+  
+
+    <script type="text/javascript">
+    $(document).ready(function(){
+		
+		$(window).on('resize', function() {
+			set_scrollable_divs_height();
+		});
+		
+		$.get('/sync/').success(function(html) {
+			;
+		});
+		
+		$.get('/overview/left').success(function(html){
+			$('#stationoverview').html(html);
+			set_scrollable_divs_height();
+			stationheader_interval = setInterval(function(){
+				$.get('/overview/left').success(function(html){
+					if (html != ""){
+						$('#stationoverview').html(html);
+					}
+				});
+			},2000);
+		});
+		$.get('/stationheader/').success(function(html){
+			$('#stationheader').html(html);
+			set_scrollable_divs_height();
+			stationheader_interval = setInterval(function(){
+				$.get('/stationheader/').success(function(html){
+					$('#stationheader').html(html);
+				});
+			},1000);
+		});
+		$.get('/queue/').success(function(html){
+			$('#stationcontent').html(html);
+		});
+		
+		$('.pill-btn').on('click',function() {
+			$('.pill-btn').parent().removeClass('active');
+			$(this).parent().addClass('active');
+			
+			
+			if ($(this).attr('id') == 'nowplaying') {
+				$.get('/nowplaying/').success(function(html){
+					$('#stationcontent').html(html);
+				});
+			}
+			else if ($(this).attr('id') == 'queue') {
+				$.get('/queue/').success(function(html){
+					$('#stationcontent').html(html);
+					
+				});
+			}
+			else if ($(this).attr('id') == 'search') {
+				$.post('/search/',{'term' : ""}).success(function(html){
+					$('#stationcontent').html(html);
+					
+				});
+			}
+			
+		});
+	});
+	
+	function set_scrollable_divs_height() {
+		var window_height = $(window).height();
+		div_height = window_height - $('#stationcontent').position().top - 75;
+		div_height = parseInt(div_height) + "px";
+		$("#stationcontent").css('height',div_height);
+		div_height = window_height - $('#stationoverview').position().top - 75;
+		div_height = parseInt(div_height) + "px";
+		$("#stationoverview").css('height',div_height);
+}
+    
+	</script>

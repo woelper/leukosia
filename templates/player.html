@@ -1,9 +1,18 @@
 <!-- Content of player.html
     ================================================== -->
-
-song: {{ current_song }}
-<br>
-status: {{ status }}
+<div class="container-fluid">
+	<div class="row-fluid" style="margin-top:10px;">
+		<img src="{{ listen_station.album.albumcover }}" style="height:50px;" class="pull-left"/>
+		<div class="span3" style="margin-top:-10px;">
+			<h4><i class="icon-headphones"></i> {{ listen_station.stream_name }}</h4>
+			<p>{{ listen_station.current_song.artist }} - {{ listen_station.current_song.title }}</p>
+		</div>
+		<div class="span3" style="margin-top:-10px;">
+			<h4>&nbsp;</h4>
+			<p>next: {{ listen_station.status.nextsong }}</p>
+		</div>
+	</div>
+</div>
 	<!-- Le javascript from stations_stationlist.html
     ================================================== -->
   

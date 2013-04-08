@@ -1,192 +1,23 @@
-{% extends "master.html" %}
-{%block content%}
-    <div class="container-fluid">
 
-		<div class="row-fluid">
-		
-			<div class="content content-left span9">
-				
-				<div class="tabbable">
-					<ul class="nav nav-tabs">
-					  <li class="active"><a href="#tab1" data-toggle="tab">Now Playing</a></li>
-					  <li><a href="#tab2" data-toggle="tab">Artistinfo</a></li>
-					  <li><a href="#tab3" data-toggle="tab">Play Queue</a></li>
-					  <li><a href="#tab4" data-toggle="tab">Playlists</a></li>
-					  <li><a href="#tab5" data-toggle="tab">Now Playing</a></li>
-					  <li><a href="#tab6" data-toggle="tab">Now Playing</a></li>
-					</ul>
-					
-					<div class="tab-content">
-						<div class="tab-pane active" id="tab1">
-							
-							<div id="albumcovercontainer" class="pull-left imgcontainer">
-								<img src="{{STATIC_URL}}img/loading.gif" />
-							</div>
-							<div id="trackinfo" style="display:none" class="pull-left">
-								<!-- trackinfo created by ajax call -->
-							</div>
-						</div>
-						
-						<div class="tab-pane" id="tab2">
-							<div id="artistinfo">
-							</div>
-						</div>
-						
-						<div class="tab-pane" id="tab3">
-							<table class="table table-condensed table-striped">
-								<thead>
-									<tr>			
-									<th>Track</th>
-									<th>Title</th>
-									<th>Artist</th>
-									<th>Album</th>
-									<th>Date</th>
-									<th>Genre</th>
-									<th>Duration</th>		
-								</tr>		
-								</thead>
-								<tbody>
-								{% for e in playlist%}
-								<tr>
-									<td>{{e.track}}</td>
-									<td>{{e.title}}</td>
-									<td>{{e.artist}}</td>
-									<td>{{e.album}}</td>
-									<td>{{e.date}}</td>
-									<td>{{e.genre}}</td>
-									<td>{{e.time}}</td>
-								</tr>
-								{% endfor %}
-								</tbody>
-							</table>
-							
-						</div>
-						<div class="tab-pane" id="tab4">
-							<div id="artistinfo">
-							</div>
-						</div>
-						<div class="tab-pane" id="tab5">
-							<div id="artistinfo">
-							</div>
-						</div>
-						<div class="tab-pane" id="tab6">
-							<div id="artistinfo">
-							</div>
-						</div>
-					</div>
-				</div>
-				
-			</div> <!-- /content --> 
-
-		
-		
-
-    
-
-    <!-- Le javascript
+<!-- Content of nowplaying.html
     ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
+<div class="span6">
+	<h4>{{ station.current_song.artist }}</h4>
+	<p>{{ station.artist.genre }}</p>
+	<img class="img-rounded span8" src="{{ station.artist.coverimage }}"/>
+</div>
+
+
+	
+
+
+
+	<!-- Le javascript from stations_stationlist.html
+    ================================================== -->
+  
+
     <script type="text/javascript">
-	var html = "";
-	var last_artist = "";
-	var last_album = "";
-	var cur_artist;
-	var cur_album;
-	
-	
-	$(document).ready(function () {
-		update_nowplaying();
-		setInterval(update_nowplaying,5000);
-	});
-	
-	function render_stationoverview () {
-		$.get('/stationoverview')
-		.done(function(data) {
-			$('#content').html(data);
-			navhtml = '<li><a href="#">Station</a></li>'+
-						'<li><a href="#">Station</a></li>';
-			$('#nav').html(navhtml);
-			}
-		);
-	}
-	
-	
-	function update_albumcover(artist,album) {
-		
-		$.getJSON("{{lastfm_url}}",{
-          "api_key":  "{{lastfm_key}}",
-          "format":   "json",
-          "artist":artist,
-          "album":album,
-          "method":"album.getInfo"
-        })
-        .done(function(data) {
-			$('#albumcovercontainer').html('<img id="albumcover" class="img-polaroid lastfm" src="'+
-				data['album']['image'][3]['#text']+'" style="border:1px solid #F8F8F8;">');	
-		});
-		
-	}
-	
-	function update_artistinfo(artist) {
-		
-		$.getJSON("{{lastfm_url}}",{
-          "api_key":  "{{lastfm_key}}",
-          "format":   "json",
-          "artist": artist,
-          "method": "artist.getInfo"
-        })
-        .done(function(data) {
-			tags = "";
-			for (i in data['artist']['tags']['tag']) {
-				tags = tags + data['artist']['tags']['tag'][i]['name'] + ", ";
-			}
-			tags = tags.substring(0, tags.length - 2);
-			$('#artistinfo').html('<div class="pull-left imgcontainer">' +
-				'<img id="artistimage" class="img-polaroid pull-left " src="'+
-				data['artist']['image'][3]['#text']+
-				'" style="border:1px solid #F8F8F8;">'+
-				'</div>'+
-				"<p><strong>" + data['artist']['name'] + "</strong>" +
-				//data['artist']['bio']['formationlist']['formation']['yearfrom'] +
-				"<br><em>" + tags + "</em><br></p>" +
-				data['artist']['bio']['summary']);
-		});
-		
-	}
-	
-	
-	
-	function update_nowplaying() {
-		$.getJSON('/nowplaying/',
-		{'station_port':{{station_port|safe}} })
-		.done(function(data) { 
-			cur_artist = data.artist;
-			cur_album = data.album;
-			html = "<b>" + data.title + "</b><br><br>" +
-				"<b>" + data.artist + "</b><br>" +
-				data.album + " (" + data.date + ")<br><br>" +
-				"<small>" +
-				"Genre: " + data.genre + "<br>" +
-				"Track: "+ data.track + "<br>" +
-				"Length: " + data.time + "<br>" +
-				"</small>"
-			$("#trackinfo").html(html);
-			
-			$('#trackinfo').show();
-			
-			if (cur_album != last_album) { //if album changes
-				$('#albumcovercontainer').html('<img src="{{STATIC_URL}}img/loading.gif" />');
-				update_albumcover(cur_artist,cur_album);
-			}
-			if (last_artist != cur_artist) { //if album changes
-				$('#artistinfo').html('<img src="{{STATIC_URL}}img/loading.gif" />');
-				update_artistinfo(cur_artist);
-			}
-			last_artist = cur_artist;
-			last_album = cur_album
-		});
-	}
-		
-	
-</script>
-{% endblock %}
+  
+    
+    
+	</script>

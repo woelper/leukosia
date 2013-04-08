@@ -1,10 +1,31 @@
+
 body {
 	padding-top: 70px;
-	padding-bottom: 50px;
+	padding-bottom: 40px;
+	font-size: 11px;
+	line-height: 14px;
+}
+
+#stationcontent, #stationoverview {
+overflow:auto;
+min-height:250px !important;
+}
+
+#footer {
+	position:fixed;
+	bottom: 0px;
+	left:0px;
+	right:0px;
+	height:0px;
+	background-color:#feffff;
+	border-top: 1px solid #eeeeee;
+}
+
+.clickable{
+	cursor:pointer;
 }
 .navbar img {
-position:absolute;
-
+	position:absolute;
 }
 .form-signin {
 	margin:auto;
@@ -12,21 +33,24 @@ position:absolute;
 	max-width:300px;
 }
 
-img.lastfm {
-	width:auto;
-}
-.overlay {
-	position:fixed;
-	bottom:0px;
-	max-height:50%;
-	overflow:auto;
-	background-color:inherit;
-	
-	-moz-box-shadow:0 0 5em #dddddd;
-	-webkit-box-shadow:0 0 1em #dddddd;
-	box-shadow:0 0 1em #dddddd;
-}
 #chat2 {
 	height:auto;
 	
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+ 
+::-webkit-scrollbar-track { 
+    border-radius: 0px;
+    background-color: #fff;
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 0px;
+    height: 50px;
+	background-color: #eee;
+	border: 1px solid #ddd;
+	//-webkit-border-radius: 6px;
 }

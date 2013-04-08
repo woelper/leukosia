@@ -16,9 +16,25 @@ urlpatterns = patterns('',
     
     
     # url for rendering the main contents
-    url(r'^$', 'webfrontend.views.render_login',name='index'),
-    url(r'^main/', 'webfrontend.views.main',name='main'),
-    url(r'^logout/', 'webfrontend.views.logout_view',name='main'),
+    url(r'^login/', 'webfrontend.views.render_login',name='index'),
+    url(r'^$', 'webfrontend.views.main',name='main'),
+    url(r'^logout/', 'webfrontend.views.logout_view',name='logout'),
+    
+    url(r'^station/(?P<port>\w+)/$', 'webfrontend.views.station', name='station'),
+    url(r'^overview/(?P<rendertype>\w+)/$', 'webfrontend.views.overview', name='overview'),
+    url(r'^stationheader/', 'webfrontend.views.stationheader', name='stationheader'),
+    
+    url(r'^queue/', 'webfrontend.views.queue', name='queue'),
+    url(r'^nowplaying/', 'webfrontend.views.nowplaying', name='nowplaying'),
+    url(r'^search/', 'webfrontend.views.search', name='search'),
+    
+    url(r'^listen/', 'webfrontend.views.listen', name='toggle_audio'),
+    url(r'^render-player/', 'webfrontend.views.render_player', name='render_player'),
+    url(r'^register-listen-port/(?P<port>\w+)/$', 'webfrontend.views.register_listen_port', name='register_listen_port'),
+
+    url(r'^mpd/', 'webfrontend.views.mpd', name='mpd'),
+
+    
    
     
     # urls for rendering dynamic content
@@ -28,16 +44,18 @@ urlpatterns = patterns('',
     url(r'^render-station-details-playlists/', 'webfrontend.views.render_station_details_playlists'),
     url(r'^render-station-details-library-artist/', 'webfrontend.views.render_station_details_library_artist'),
     url(r'^render-station-details-library-album/', 'webfrontend.views.render_station_details_library_album'),
-    url(r'^render-station-details-library-folder/', 'webfrontend.views.render_station_details_library_folder'),
+    #url(r'^render-station-details-library-folder/', 'webfrontend.views.render_station_details_library_folder'),
     url(r'^render-player/', 'webfrontend.views.render_player'),
     url(r'^render-chat/', 'webfrontend.views.render_chat'),
     url(r'^save-settings/', 'webfrontend.views.save_settings'),
+    
+    url(r'^update-database/', 'webfrontend.views.update_songdatabase'),
     
     # urls for posting data to server
     url(r'^post-chat/', 'webfrontend.views.post_chat'),
     
     # urls for mpd commands
-    url(r'^mpd-cmd/', 'webfrontend.views.mpd_cmd'),
+    
     
     #url(r'^playqueue/', 'webfrontend.views.playqueue'),    
     

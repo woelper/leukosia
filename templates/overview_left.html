@@ -1,0 +1,66 @@
+
+<!-- Content of overview.html
+    ================================================== -->
+
+		
+		{% for station in stationlist %}
+		<div id="{{ station.admin_port }}" class="well well-small clickable">
+			<span class="badge badge-{{ station.badge }} pull-right"><small>{{ station.status_display }}</small></span>
+			<h4>{{ station.stream_name }}</h2>
+			
+			
+		
+			{% if station.current_song %}
+			
+			{% if station.current_song.artist != "" %}
+					{{ station.current_song.artist }} 
+				{% if station.current_song.title != "" %}
+					- {{ station.current_song.title }} 
+				{% endif %}
+				{% if station.curren_song.genre %}
+					({{ station.curren_song.genre }})
+				{% endif %}
+			{% else %}
+				{{ station.current_song.file }}
+				{% endif %}
+				{% if station.artist.genre %}
+					<br>
+					<span class="muted">{{ station.artist.genre }}</span>
+				{% endif %}
+			{% else %}
+				* End of Queue reached *
+			{% endif %}
+		</div>
+		{% endfor %}
+		
+
+
+
+	<!-- Le javascript from stations_stationlist.html
+    ================================================== -->
+
+  
+
+    <script type="text/javascript">
+	
+	$(document).ready(function() {
+		
+		$('.clickable').on('click', function () {
+			//$('#maincontent').hide();
+			var id = $(this).attr('id');
+			$.post('station/' + id + "/").success(function() {
+				$.get('/stationheader/').success(function(html){
+					$('#stationheader').html(html);
+				});
+				$.get('/queue/').success(function(html){
+					$('#stationcontent').html(html);
+					$('.pill-btn').parent().removeClass('active');
+					$('#queue').parent().addClass('active');
+			
+				});
+			});
+			
+		});
+	});
+
+	</script>

@@ -3,6 +3,7 @@
 
 
 <div class="container-fluid">
+	<hr>
 {% for album in albums %}
 
 <div class="row-fluid"> 
@@ -11,7 +12,8 @@
 		<img src="http://cdn.last.fm/flatness/responsive/2/noimage/default_artist_140_g2.png" alt="">
      </div>
      <div class="span10">
-			<strong>{{ album }}</strong>
+			<strong>{{ album }}</strong> 
+			<button class="add-album" id="{{ forloop.counter }}" class="btn">add to Queue</button>
      </div>
 
 </div>
